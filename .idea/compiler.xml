@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+      </profile>
+      <profile name="Annotation profile for AdvancedJobs" enabled="true">
+        <sourceOutputDir name="../../../../Desktop/Developpment Minecraft/Minecraft Developpment 1.13/plugins/generated-sources/annotations" />
+        <sourceTestOutputDir name="../../../../Desktop/Developpment Minecraft/Minecraft Developpment 1.13/plugins/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="AdvancedJobs" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>

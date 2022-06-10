@@ -1,0 +1,23 @@
+##############################################################
+############# DO NEVER MODIFY THIS FILE BY HAND  #############
+############# IF YOU WANT TO EDIT THE JOBS DO IT #############
+#############    THROUGH THE INGAME INTERFACE.   #############
+#############   RISK OF LOOSING PLAYERS DATA !   #############
+##############################################################
+
+Bucheron:
+  max_level: 20
+  first_level_experience: 2000
+  experience_growth: 600
+  experience_sources:
+    BREAK:
+      minecraft:oak_log :
+        0: 100
+        5: 50
+        10: 25
+        15: 10 - 15
+        20: 1
+      minecraft::oak_plank:
+        0: 10
+        3: 0
+
