@@ -2,7 +2,7 @@ package be.elgem;
 
 import be.elgem.Configuration.CustomConfigurationInterface;
 import be.elgem.Jobs.Jobs.JobsLoader;
-import org.bukkit.configuration.ConfigurationSection;
+import be.elgem.SQL.SQLInterface;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -12,6 +12,8 @@ public class Main extends JavaPlugin {
     private JobsLoader jobsLoader;
 
     private CustomConfigurationInterface jobsConfig;
+
+    private SQLInterface playerSQLInterface;
 
     @Override
     public void onEnable() {
@@ -24,6 +26,10 @@ public class Main extends JavaPlugin {
         jobsConfig = new CustomConfigurationInterface("jobs.yml");
 
         jobsLoader = new JobsLoader();
+
+        playerSQLInterface = new SQLInterface();
+
+        playerSQLInterface.createTablesIfPossible();
     }
 
     @Override
@@ -41,5 +47,9 @@ public class Main extends JavaPlugin {
 
     public FileConfiguration getJobsConfig() {
         return jobsConfig.getCustomConfigFile();
+    }
+
+    public SQLInterface getSQLInterface() {
+        return playerSQLInterface;
     }
 }

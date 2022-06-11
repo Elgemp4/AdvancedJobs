@@ -23,10 +23,10 @@ public class JobsLoader {
 
         loadJobs();
 
-        for (Job job: jobsArray) {
-            System.out.println(job.getJobName());
-            System.out.println(job.getXpFor(EWayToXP.BREAK, "minecraft:oak_log", 10));
-        }
+//        for (Job job: jobsArray) {
+//            System.out.println(job.getJobName());
+//            System.out.println(job.getXpFor(EWayToXP.BREAK, "minecraft:oak_log", 10));
+//        }
     }
 
     private void loadJobs() {
@@ -35,7 +35,7 @@ public class JobsLoader {
         for (String jobsName : pluginConfig.getKeys(false)) {
             ConfigurationSection jobSection = pluginConfig.getConfigurationSection(jobsName);
 
-            int maxLevel = jobSection.getInt("max_level");
+            short maxLevel = (short) jobSection.getInt("max_level");
             int firstLevelExperience = jobSection.getInt("first_level_experience");
             int experienceGrowth = jobSection.getInt("experience_growth");
 

@@ -5,7 +5,7 @@ import javax.swing.*;
 public class LevelTest {
     public static void main(String[] args) {
         int input = 0;
-        Level level = new Level(1, 20, 0, 1000, 600);
+        Level level = new Level((short) 1, (short) 20, 0, 1000, 600);
         while (true){
             input = Integer.parseInt(JOptionPane.showInputDialog("Montant d'xp à ajouter : "));
             level.addExperience(input);

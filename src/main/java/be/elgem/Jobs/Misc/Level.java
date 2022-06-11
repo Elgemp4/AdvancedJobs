@@ -8,10 +8,10 @@ public class Level {
 
     private int initialMaxExperience;
 
-    private int maxLevel;
-    private int level;
+    private short maxLevel;
+    private short level;
 
-    public Level(int level, int maxLevel, int experience, int initialMaxExperience, double experienceGrowth) {
+    public Level(short level, short maxLevel, int experience, int initialMaxExperience, double experienceGrowth) {
         this.experience = experience;
         this.level = level;
         this.maxLevel = maxLevel;

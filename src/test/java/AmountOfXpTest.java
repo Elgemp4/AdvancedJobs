@@ -13,5 +13,7 @@ public class AmountOfXpTest {
         while (true) {
             System.out.println(amountOfXp.getAmountOfXp(Integer.parseInt(JOptionPane.showInputDialog("Entrez la valeur : "))));
         }
+
+
     }
 }

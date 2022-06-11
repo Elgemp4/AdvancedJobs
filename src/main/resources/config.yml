@@ -1,0 +1,6 @@
+sql_database:
+  host: "jdbc:mysql://localhost"
+  port: "3306"
+  user: "root"
+  password: "root"
+  database_name: "PlayerJobsData"

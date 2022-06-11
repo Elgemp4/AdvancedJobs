@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class Job {
     private String jobName;
 
-    private int maxLevel;
+    private short maxLevel;
     private int experienceGrowth;
     private int firstLevelExperience;
 
@@ -26,7 +26,7 @@ public class Job {
 
 //    private HashMap<Integer, ItemStack> reward; TODO
 
-    public Job(String jobName, int maxLevel, int firstLevelExperience, int experienceGrowth) {
+    public Job(String jobName, short maxLevel, int firstLevelExperience, int experienceGrowth) {
         this.jobName = jobName;
 
         this.maxLevel = maxLevel;
@@ -57,7 +57,7 @@ public class Job {
         this.jobName = jobName;
     }
 
-    public int getMaxLevel() {
+    public short getMaxLevel() {
         return maxLevel;
     }
 
