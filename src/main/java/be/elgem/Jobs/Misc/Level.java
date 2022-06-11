@@ -121,14 +121,14 @@ public class Level {
     /**
      * @return Current level of the job
      */
-    public int getLevel() {
+    public short getLevel() {
         return this.level;
     }
 
     /**
      * @return Maximum level of the job
      */
-    public int getMaxLevel() {
+    public short getMaxLevel() {
         return this.maxLevel;
     }
 }

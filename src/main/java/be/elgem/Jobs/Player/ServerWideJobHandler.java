@@ -1,7 +1,9 @@
 package be.elgem.Jobs.Player;
 
+import be.elgem.Jobs.Misc.Level;
 import be.elgem.Main;
 import be.elgem.SQL.SQLInterface;
+import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -11,54 +13,39 @@ public class ServerWideJobHandler {
 
     private HashMap<UUID, PlayerJobsHandler> serverWideJobsMap;
 
-    private boolean firstPlayer = false;
     private boolean firstJob = false;
 
     public ServerWideJobHandler() {
         this.sqlInterface = Main.getMain().getSQLInterface();
 
         serverWideJobsMap = new HashMap<>();
+
+        Bukkit.getScheduler().runTaskTimer(Main.getMain(), () ->{
+            sendAllDataToDatabase();
+        }, 20, 120);
     }
 
     private void sendAllDataToDatabase(){
-        String playersToAdd = "";
         String jobsToModify = "";
 
-        firstPlayer = true;
         firstJob = true;
 
         for (UUID playerUUID : serverWideJobsMap.keySet()) {
-            playersToAdd+=formatNewPlayer(playerUUID);
-
             for (PlayerJobData playerJobData : serverWideJobsMap.get(playerUUID).getPlayerJobData()) {
-
+                Level playerLevel = playerJobData.getLevel();
+                jobsToModify += formatJob(playerUUID, playerJobData.getJob().getJobName(), playerLevel.getLevel(), playerLevel.getExperience());
             }
 
 
         }
 
-        System.out.println(playersToAdd);
-        System.out.println(jobsToModify);
-
-
-        sqlInterface.actualizeDatas(playersToAdd, jobsToModify);
+        if(!jobsToModify.isEmpty()){
+            sqlInterface.actualizeDatas(jobsToModify);
+        }
     }
 
-    private String formatNewPlayer(UUID playerUUID) {
-        String newPlayer = "";
 
-        if(firstPlayer){
-            firstPlayer = false;
-        }
-        else{
-            newPlayer += ",";
-        }
-        newPlayer += "("+sqlInterface.UUIDToBytes(playerUUID)+")";
-
-        return newPlayer;
-    }
-
-    private String formatJob() {
+    private String formatJob(UUID playerUUID, String jobName, short level, int experience) {
         String newJob = "";
 
         if(firstJob){

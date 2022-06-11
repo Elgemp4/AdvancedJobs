@@ -63,11 +63,11 @@ public class SQLInterface {
                 Statement jobsStatement = connection.createStatement();
                 String jobsTableRequest =       "CREATE TABLE IF NOT EXISTS players_jobs(" +
                                                 "job_id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT," +
-                                                "player_id MEDIUMINT UNSIGNED NOT NULL," +
-                                                "job_name VARCHAR(20) NOT NULL, job_level SMALLINT NOT NULL," +
+                                                "player_uuid Binary(16) NOT NULL," +
+                                                "job_name VARCHAR(20) NOT NULL, " +
+                                                "job_level SMALLINT NOT NULL," +
                                                 "job_experience INT NOT NULL," +
-                                                "FOREIGN KEY(player_id) REFERENCES players(player_id)," +
-                                                "INDEX ind_player_id (job_name))" +
+                                                "INDEX ind_job_name (job_name))" +
                                                 "ENGINE=INNODB;";
 
                 jobsStatement.execute(jobsTableRequest);
@@ -94,16 +94,9 @@ public class SQLInterface {
             Statement jobStatement = null;
 
             try {
-                int id = getPlayerID(playerUUID);
-
-                if(id == -1){
-                    callback.retrievePlayerInfo((short)1, 0);
-                    return;
-                }
-
                 jobStatement = connection.createStatement();
 
-                String jobQuery = "SELECT job_level AS level, job_experience AS xp FROM players_jobs WHERE player_id = " + id + " AND job_name = \"" + job + "\";";
+                String jobQuery = "SELECT job_level AS level, job_experience AS xp FROM players_jobs WHERE player_uuid = " + UUIDToBytes(playerUUID) + " AND job_name = \"" + job + "\";";
 
                 ResultSet resultSet = jobStatement.executeQuery(jobQuery);
 
@@ -120,14 +113,15 @@ public class SQLInterface {
         });
     }
 
-    public void actualizeDatas(String players, String jobsData) {
+    public void actualizeDatas(String jobsData) {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () ->{
+            connectToDatabase();
+
             Statement insertStatement = null;
             try{
                 insertStatement = connection.createStatement();
 
-                String insertRequest = "INSERT IGNORE INTO players(player_uuid) VALUES " + players + ";";
-                insertRequest += "INSERT INTO players_jobs() VALUES" + jobsData + ";";
+                String insertRequest = "INSERT INTO players_jobs VALUES" + jobsData + ";";
 
                 insertStatement.execute(insertRequest);
             }
@@ -135,7 +129,7 @@ public class SQLInterface {
                 e.printStackTrace();
             }
             finally {
-                try{if(insertStatement!=null) insertStatement.close();}catch(Exception e){}
+                try {if(insertStatement!=null) insertStatement.close();} catch(Exception e){}
             }
         });
 

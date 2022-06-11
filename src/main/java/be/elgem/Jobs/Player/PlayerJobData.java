@@ -24,4 +24,11 @@ public class PlayerJobData {
         level.addExperience(experienceToAdd);
     }
 
+    public Level getLevel() {
+        return level;
+    }
+
+    public Job getJob() {
+        return job;
+    }
 }
