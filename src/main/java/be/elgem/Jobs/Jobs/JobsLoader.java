@@ -75,8 +75,8 @@ public class JobsLoader {
                 int requiredLevelInt = Integer.parseInt(requiredLevel);
 
                 //Variable Experience
-                if(amountOfXpSection.getString(requiredLevel).contains("-")) {
-                    String[] xp = amountOfXpSection.getString(requiredLevel).replaceAll("\\s", "").split("-");
+                if(amountOfXpSection.getString(requiredLevel).contains("/")) {
+                    String[] xp = amountOfXpSection.getString(requiredLevel).replaceAll("\\s", "").split("/");
                     amountOfXp.addXpForLevel(requiredLevelInt, Integer.parseInt(xp[0]), Integer.parseInt(xp[1]));
                 }
 

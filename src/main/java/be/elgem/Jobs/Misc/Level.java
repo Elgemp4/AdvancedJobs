@@ -1,6 +1,11 @@
 package be.elgem.Jobs.Misc;
 
+import be.elgem.Main;
+import org.bukkit.entity.Player;
+
 public class Level {
+    private Player player;
+
     private double experienceGrowth;
 
     private int maxLevelExperience;
@@ -11,12 +16,14 @@ public class Level {
     private short maxLevel;
     private short level;
 
-    public Level(short level, short maxLevel, int experience, int initialMaxExperience, double experienceGrowth) {
+    public Level(short level, short maxLevel, int experience, int initialMaxExperience, double experienceGrowth, Player player) {
         this.experience = experience;
         this.level = level;
         this.maxLevel = maxLevel;
         this.initialMaxExperience = initialMaxExperience;
         this.experienceGrowth = experienceGrowth;
+
+        this.player = player;
 
         computeMaxExperience();
     }
@@ -86,6 +93,7 @@ public class Level {
         }
         else{
             level++;
+            Main.getMain().getJobsInfoDisplay().showLevelUp(level, player);
             return true;
         }
     }

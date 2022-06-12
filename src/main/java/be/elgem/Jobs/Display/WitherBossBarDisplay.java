@@ -42,14 +42,4 @@ public class WitherBossBarDisplay extends Display{
             bossBar.removeAll();
         }, 40);
     }
-
-    @Override
-    public void showLevelUp(int newLevel) {
-
-    }
-
-    @Override
-    public void showLevelDown(int newLevel) {
-
-    }
 }

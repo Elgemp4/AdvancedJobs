@@ -29,7 +29,7 @@ public class PlayerJobsHandler {
                 }
             });
             sqlInterface.loadJobsData(job.getJobName(), playerUUID, (level, experience) -> {
-                playerJobData.add(new PlayerJobData(job, new Level(level, job.getMaxLevel(), experience, job.getFirstLevelExperience(), job.getExperienceGrowth()), player));
+                playerJobData.add(new PlayerJobData(job, new Level(level, job.getMaxLevel(), experience, job.getFirstLevelExperience(), job.getExperienceGrowth(), player), player));
             });
         }
     }
