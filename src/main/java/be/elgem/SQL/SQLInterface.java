@@ -1,11 +1,10 @@
 package be.elgem.SQL;
 
+import be.elgem.Jobs.Jobs.Job;
 import be.elgem.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.sql.*;
 import java.util.UUID;
 
@@ -67,7 +66,7 @@ public class SQLInterface {
                                                 "job_name VARCHAR(20) NOT NULL, " +
                                                 "job_level SMALLINT NOT NULL," +
                                                 "job_experience INT NOT NULL," +
-                                                "INDEX ind_job_name (job_name))" +
+                                                "UNIQUE KEY uidx_job (job_name, player_uuid))" +
                                                 "ENGINE=INNODB;";
 
                 jobsStatement.execute(jobsTableRequest);
@@ -91,14 +90,17 @@ public class SQLInterface {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () -> {
             connectToDatabase();
 
-            Statement jobStatement = null;
+            PreparedStatement jobStatement = null;
 
             try {
-                jobStatement = connection.createStatement();
+                jobStatement = connection.prepareStatement( "SELECT job_level AS level, job_experience AS xp " +
+                                                                "FROM players_jobs " +
+                                                                "WHERE player_uuid = UNHEX(?) AND job_name = ?;");
 
-                String jobQuery = "SELECT job_level AS level, job_experience AS xp FROM players_jobs WHERE player_uuid = " + UUIDToBytes(playerUUID) + " AND job_name = \"" + job + "\";";
+                jobStatement.setString(1, UUIDToBytes(playerUUID));
+                jobStatement.setString(2, job);
 
-                ResultSet resultSet = jobStatement.executeQuery(jobQuery);
+                ResultSet resultSet = jobStatement.executeQuery();
 
                 if(resultSet.next())
                     callback.retrievePlayerInfo(resultSet.getShort("level"), resultSet.getInt("xp"));
@@ -113,17 +115,74 @@ public class SQLInterface {
         });
     }
 
-    public void actualizeDatas(String jobsData) {
+    public void updatePlayerLevel(Short level, int experience, UUID playerUUID, String job) {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () ->{
             connectToDatabase();
 
-            Statement insertStatement = null;
+            PreparedStatement updateStatement = null;
             try{
-                insertStatement = connection.createStatement();
+                updateStatement = connection.prepareStatement(  "UPDATE players_jobs " +
+                                                                    "SET job_level = ?, job_experience = ? " +
+                                                                    "WHERE player_uuid = UNHEX(?) AND job_name = ?;");
 
-                String insertRequest = "INSERT INTO players_jobs VALUES" + jobsData + ";";
+                updateStatement.setShort(1, level);
+                updateStatement.setInt(2, experience);
+                updateStatement.setString(3, UUIDToBytes(playerUUID));
+                updateStatement.setString(4, job);
 
-                insertStatement.execute(insertRequest);
+                updateStatement.executeUpdate();
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+            finally {
+                try {if(updateStatement!=null) updateStatement.close();} catch(Exception e){}
+            }
+        });
+    }
+
+    public void doesPlayerJobExists(UUID playerUUID, String job_name, SQLCallback sqlCallback){
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () ->{
+            connectToDatabase();
+
+            PreparedStatement existStatement = null;
+            try{
+                existStatement = connection.prepareStatement(" SELECT EXISTS( SELECT * FROM players_jobs WHERE(player_uuid = UNHEX(?) AND job_name = ?)) AS exist;");
+
+                existStatement.setString(1, UUIDToBytes(playerUUID));
+                existStatement.setString(2, job_name);
+
+                ResultSet resultSet = existStatement.executeQuery();
+
+                if(resultSet.next()) {
+                    if(!resultSet.getBoolean("exist")) {
+                        sqlCallback.retrievePlayerInfo((short) -1, -1);
+                    }
+
+                }
+            }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
+            finally {
+                try {if(existStatement!=null) existStatement.close();} catch(Exception e){}
+            }
+        });
+    }
+
+    public void insertPlayerJob(UUID playerUUID, String job_name) {
+        Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () ->{
+            connectToDatabase();
+
+            PreparedStatement insertStatement = null;
+            try{
+                insertStatement = connection.prepareStatement(  "INSERT INTO players_jobs (player_uuid, job_name, job_level, job_experience) " +
+                                                                    "VALUES (UNHEX(?), ?, 1, 0);");
+
+                insertStatement.setString(1, UUIDToBytes(playerUUID));
+                insertStatement.setString(2, job_name);
+
+                insertStatement.executeUpdate();
             }
             catch (SQLException e) {
                 e.printStackTrace();
@@ -135,70 +194,13 @@ public class SQLInterface {
 
     }
 
-//    private int getPlayerID(UUID playerUUID) {
-//        Statement playerIDStatement = null;
-//        try {
-//            playerIDStatement = connection.createStatement();
-//
-//            String getId = "SELECT player_id AS id FROM players WHERE player_uuid = " + UUIDToBytes(playerUUID) + ";";
-//
-//            ResultSet resultSet = playerIDStatement.executeQuery(getId);
-//
-//            int id = -1;
-//
-//            if(resultSet.next()){
-//                id = resultSet.getInt("id");
-//            }
-//
-//            playerIDStatement.close();
-//
-//            return id;
-//
-//        }
-//        catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        finally {
-//            try {if(playerIDStatement != null) playerIDStatement.close();} catch (Exception e){}
-//        }
-//
-//        return -1;
-//    }
 
     public String UUIDToBytes(UUID playerUUID) {
-        byte[] binaryUUID = new byte[16];
-        ByteBuffer.wrap(binaryUUID)
-                .order(ByteOrder.BIG_ENDIAN)
-                .putLong(playerUUID.getLeastSignificantBits())
-                .putLong(playerUUID.getMostSignificantBits());
+        String stringUUID = playerUUID.toString().replaceAll("-","");
 
-        return binaryUUID.toString().replaceAll("\\[B@", "@B");
+//        System.out.println(playerUUID);
+//        System.out.println(stringUUID);
+
+        return stringUUID;
     }
-
-//        public boolean isPlayerInDatabase(UUID playerUUID) {
-//        Statement getPlayerStatement = null;
-//        boolean exists = false;
-//
-//        try{
-//            getPlayerStatement = connection.createStatement();
-//
-//            String isPresentRequest = "SELECT EXISTS(SELECT * FROM players WHERE player_uuid = " + UUIDToBytes(playerUUID) + ") AS exists;";
-//
-//            ResultSet resultSet = getPlayerStatement.executeQuery(isPresentRequest);
-//
-//
-//
-//            if(resultSet.next()) {
-//                exists = resultSet.getBoolean("exists");
-//            }
-//        }
-//        catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        finally {
-//            try{if(getPlayerStatement!=null) getPlayerStatement.close();}catch(Exception e){}
-//        }
-//
-//        return exists;
-//    }
 }

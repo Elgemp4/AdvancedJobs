@@ -13,8 +13,6 @@ public class ServerWideJobHandler {
 
     private HashMap<UUID, PlayerJobsHandler> serverWideJobsMap;
 
-    private boolean firstJob = false;
-
     public ServerWideJobHandler() {
         this.sqlInterface = Main.getMain().getSQLInterface();
 
@@ -26,37 +24,20 @@ public class ServerWideJobHandler {
     }
 
     private void sendAllDataToDatabase(){
-        String jobsToModify = "";
-
-        firstJob = true;
-
         for (UUID playerUUID : serverWideJobsMap.keySet()) {
             for (PlayerJobData playerJobData : serverWideJobsMap.get(playerUUID).getPlayerJobData()) {
                 Level playerLevel = playerJobData.getLevel();
-                jobsToModify += formatJob(playerUUID, playerJobData.getJob().getJobName(), playerLevel.getLevel(), playerLevel.getExperience());
+                sqlInterface.updatePlayerLevel(playerLevel.getLevel(), playerLevel.getExperience(), playerUUID, playerJobData.getJob().getJobName());
             }
-
-
-        }
-
-        if(!jobsToModify.isEmpty()){
-            sqlInterface.actualizeDatas(jobsToModify);
         }
     }
 
+    public void addJobHandler(UUID playerUUID) {
+        serverWideJobsMap.put(playerUUID, new PlayerJobsHandler(playerUUID));
+    }
 
-    private String formatJob(UUID playerUUID, String jobName, short level, int experience) {
-        String newJob = "";
-
-        if(firstJob){
-            firstJob = false;
-        }
-        else{
-            newJob += ",";
-        }
-        newJob += "("+sqlInterface.UUIDToBytes(playerUUID)+")";
-
-        return newJob;
+    public PlayerJobsHandler getPlayerJobsHandle(UUID playerUUID) {
+        return serverWideJobsMap.get(playerUUID);
     }
 }
 
