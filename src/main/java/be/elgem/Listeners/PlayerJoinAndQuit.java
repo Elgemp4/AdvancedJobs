@@ -8,7 +8,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class PlayerJoinAndQuit implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Main.getMain().getServerWideJobHandler().addJobHandler(event.getPlayer().getUniqueId());
-        System.out.println("ici");
+        Main.getMain().getServerWideJobHandler().addJobHandler(event.getPlayer());
     }
 }

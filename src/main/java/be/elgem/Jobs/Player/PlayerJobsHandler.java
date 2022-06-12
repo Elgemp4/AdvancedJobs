@@ -15,8 +15,10 @@ public class PlayerJobsHandler {
 
     private ArrayList<PlayerJobData> playerJobData;
 
-    public PlayerJobsHandler(UUID playerUUID) {
+    public PlayerJobsHandler(Player player) {
         playerJobData = new ArrayList<>();
+
+        UUID playerUUID = player.getUniqueId();
 
         SQLInterface sqlInterface = Main.getMain().getSQLInterface();
 
@@ -27,7 +29,7 @@ public class PlayerJobsHandler {
                 }
             });
             sqlInterface.loadJobsData(job.getJobName(), playerUUID, (level, experience) -> {
-                playerJobData.add(new PlayerJobData(job, new Level(level, job.getMaxLevel(), experience, job.getFirstLevelExperience(), job.getExperienceGrowth())));
+                playerJobData.add(new PlayerJobData(job, new Level(level, job.getMaxLevel(), experience, job.getFirstLevelExperience(), job.getExperienceGrowth()), player));
             });
         }
     }

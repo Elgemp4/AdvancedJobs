@@ -4,6 +4,7 @@ import be.elgem.Jobs.Misc.Level;
 import be.elgem.Main;
 import be.elgem.SQL.SQLInterface;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -32,11 +33,11 @@ public class ServerWideJobHandler {
         }
     }
 
-    public void addJobHandler(UUID playerUUID) {
-        serverWideJobsMap.put(playerUUID, new PlayerJobsHandler(playerUUID));
+    public void addJobHandler(Player player) {
+        serverWideJobsMap.put(player.getUniqueId(), new PlayerJobsHandler(player));
     }
 
-    public PlayerJobsHandler getPlayerJobsHandle(UUID playerUUID) {
+    public PlayerJobsHandler getPlayerJobsHandler(UUID playerUUID) {
         return serverWideJobsMap.get(playerUUID);
     }
 }

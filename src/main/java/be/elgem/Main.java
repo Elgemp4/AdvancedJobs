@@ -1,6 +1,8 @@
 package be.elgem;
 
 import be.elgem.Configuration.CustomConfigurationInterface;
+import be.elgem.Jobs.Display.Display;
+import be.elgem.Jobs.Display.WitherBossBarDisplay;
 import be.elgem.Jobs.Jobs.JobsLoader;
 import be.elgem.Jobs.Player.PlayerJobData;
 import be.elgem.Jobs.Player.PlayerJobsHandler;
@@ -25,6 +27,8 @@ public class Main extends JavaPlugin {
 
     private ListenerManager listenerManager;
 
+    private Display jobsInfoDisplay;
+
     @Override
     public void onEnable() {
         super.onEnable();
@@ -35,15 +39,21 @@ public class Main extends JavaPlugin {
 
         jobsConfig = new CustomConfigurationInterface("jobs.yml");
 
-        listenerManager = new ListenerManager();
-
         jobsLoader = new JobsLoader();
 
         playerSQLInterface = new SQLInterface();
 
         playerSQLInterface.createTablesIfPossible();
 
+        loadDisplay();
+
         serverWideJobHandler = new ServerWideJobHandler();
+
+        listenerManager = new ListenerManager();
+    }
+
+    private void loadDisplay() {
+        jobsInfoDisplay = new WitherBossBarDisplay();
     }
 
     @Override
@@ -71,6 +81,7 @@ public class Main extends JavaPlugin {
         return serverWideJobHandler;
     }
 
-
-
+    public Display getJobsInfoDisplay() {
+        return jobsInfoDisplay;
+    }
 }
