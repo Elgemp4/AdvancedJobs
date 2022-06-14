@@ -1,6 +1,9 @@
 package be.elgem.Listeners;
 
 import be.elgem.Main;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
@@ -9,6 +12,8 @@ public class ListenerManager {
     Main main;
 
     ArrayList<Listener> listeners;
+
+    ChunkLoadingListener chunkLoadingListener;
 
     public ListenerManager() {
         main = Main.getMain();
@@ -22,6 +27,8 @@ public class ListenerManager {
 
 
     private void addListeners() {
+        listeners.add(new ChunkLoadingListener());
+
         listeners.add(new PlayerJoinAndQuit());
 
         listeners.add(new BlockBreakListener());
@@ -32,4 +39,10 @@ public class ListenerManager {
             main.getServer().getPluginManager().registerEvents(listener, main);
         });
     }
+
+    public static boolean canGainExperience(Player player) {
+        return player != null && player.getGameMode() != GameMode.CREATIVE;
+    }
+
+
 }

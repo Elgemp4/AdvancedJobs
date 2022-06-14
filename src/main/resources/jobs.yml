@@ -14,8 +14,8 @@ Bucheron:
       minecraft:oak_log :
         0: 100
         5: 50
-        10: 25 - 0
-        15: 10 - 15
+        10: 25 / 0
+        15: 10 / 15
         20: 1
       minecraft:oak_planks:
         0: 10

@@ -7,12 +7,15 @@ import be.elgem.Jobs.Jobs.JobsLoader;
 import be.elgem.Jobs.Player.PlayerJobData;
 import be.elgem.Jobs.Player.PlayerJobsHandler;
 import be.elgem.Jobs.Player.ServerWideJobHandler;
+import be.elgem.Listeners.ChunkLoadingListener;
 import be.elgem.Listeners.ListenerManager;
 import be.elgem.SQL.SQLInterface;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.UUID;
+import sun.awt.windows.WPrinterJob;
 
 public class Main extends JavaPlugin {
     private static Main main;
@@ -50,16 +53,41 @@ public class Main extends JavaPlugin {
         serverWideJobHandler = new ServerWideJobHandler();
 
         listenerManager = new ListenerManager();
-    }
 
-    private void loadDisplay() {
-        jobsInfoDisplay = new WitherBossBarDisplay();
+        loadConnectedPlayer();
+
+        loadChunks();
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
+
+        System.out.println("adad");
+
+        ChunkLoadingListener.getChunkLoadingListener().saveAllChunks();
+
+        playerSQLInterface.closeConnection();
     }
+
+    private void loadConnectedPlayer() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            serverWideJobHandler.addJobHandler(player);
+        }
+    }
+
+    private void loadChunks() {
+        for (World world : Bukkit.getWorlds()){
+            System.out.println(ChunkLoadingListener.getChunkLoadingListener());
+            ChunkLoadingListener.getChunkLoadingListener().loadChunks(world.getLoadedChunks());
+        }
+
+    }
+    private void loadDisplay() {
+        jobsInfoDisplay = new WitherBossBarDisplay();
+    }
+
+
 
     public static Main getMain() {
         return Main.main;

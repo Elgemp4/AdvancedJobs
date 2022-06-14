@@ -40,6 +40,16 @@ public class SQLInterface {
         }
     }
 
+    public void closeConnection() {
+        try {
+            if(connection != null && !connection.isClosed()){
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void createTablesIfPossible() {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () -> {
             connectToDatabase();
