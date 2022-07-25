@@ -3,3 +3,6 @@ name: AdvancedJobs
 author: Elgem
 version: 1.16
 api-version: 1.16
+commands:
+  jobs:
+    description: Access to all command related to AdvancedJobs

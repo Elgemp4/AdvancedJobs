@@ -29,8 +29,6 @@ public class WitherBossBarDisplay extends Display{
         playerBossBars.put(player, bossBar);
 
         removeAfterTwoSeconds(player, bossBar);
-
-        System.out.println("ici");
     }
 
     private void removeBossBarFromPlayer(Player player) {

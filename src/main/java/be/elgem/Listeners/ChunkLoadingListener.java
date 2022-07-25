@@ -20,6 +20,18 @@ public class ChunkLoadingListener implements Listener {
         chunkPersistentDataHashMap = new HashMap<>();
     }
 
+    @EventHandler
+    public void onLoad(ChunkLoadEvent event){
+        chunkPersistentDataHashMap.put(event.getChunk(), new ChunkPersistentData(event.getChunk()));
+    }
+
+    @EventHandler
+    public void onUnload(ChunkUnloadEvent event){
+        chunkPersistentDataHashMap.get(event.getChunk()).savePlayersBlockIntoChunkData();
+
+        chunkPersistentDataHashMap.remove(event.getChunk());
+    }
+
     public void loadChunks(Chunk[] loadedChunks) {
         for (Chunk chunk : loadedChunks) {
             chunkPersistentDataHashMap.put(chunk, new ChunkPersistentData(chunk));
@@ -36,17 +48,7 @@ public class ChunkLoadingListener implements Listener {
         return chunkPersistentDataHashMap.get(chunk);
     }
 
-    @EventHandler
-    public void onLoad(ChunkLoadEvent event){
-        chunkPersistentDataHashMap.put(event.getChunk(), new ChunkPersistentData(event.getChunk()));
-    }
 
-    @EventHandler
-    public void onUnload(ChunkUnloadEvent event){
-        chunkPersistentDataHashMap.get(event.getChunk()).savePlayersBlockIntoChunkData();
-
-        chunkPersistentDataHashMap.remove(event.getChunk());
-    }
 
     public static ChunkLoadingListener getChunkLoadingListener() {
         return thisClass;

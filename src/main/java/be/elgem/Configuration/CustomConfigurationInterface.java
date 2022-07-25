@@ -23,6 +23,14 @@ public class CustomConfigurationInterface {
         customConfigFile = YamlConfiguration.loadConfiguration(customFile);
     }
 
+    public void saveConfiguration() {
+        try {
+            customConfigFile.save(customFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public FileConfiguration getCustomConfigFile() {
         return customConfigFile;
     }

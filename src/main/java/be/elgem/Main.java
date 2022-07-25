@@ -1,6 +1,7 @@
 package be.elgem;
 
 import be.elgem.Configuration.CustomConfigurationInterface;
+import be.elgem.Gui.OpenedGUI;
 import be.elgem.Jobs.Display.Display;
 import be.elgem.Jobs.Display.WitherBossBarDisplay;
 import be.elgem.Jobs.Jobs.JobsLoader;
@@ -30,6 +31,10 @@ public class Main extends JavaPlugin {
 
     private ListenerManager listenerManager;
 
+    private CommandManager commandManager;
+
+    private OpenedGUI openedGUI;
+
     private Display jobsInfoDisplay;
 
     @Override
@@ -52,7 +57,13 @@ public class Main extends JavaPlugin {
 
         serverWideJobHandler = new ServerWideJobHandler();
 
+        openedGUI = new OpenedGUI();
+
         listenerManager = new ListenerManager();
+
+        commandManager = new CommandManager();
+
+        this.getCommand("jobs").setExecutor(commandManager);
 
         loadConnectedPlayer();
 
@@ -62,8 +73,6 @@ public class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         super.onDisable();
-
-        System.out.println("adad");
 
         ChunkLoadingListener.getChunkLoadingListener().saveAllChunks();
 
@@ -78,7 +87,6 @@ public class Main extends JavaPlugin {
 
     private void loadChunks() {
         for (World world : Bukkit.getWorlds()){
-            System.out.println(ChunkLoadingListener.getChunkLoadingListener());
             ChunkLoadingListener.getChunkLoadingListener().loadChunks(world.getLoadedChunks());
         }
 
@@ -97,8 +105,8 @@ public class Main extends JavaPlugin {
         return jobsLoader;
     }
 
-    public FileConfiguration getJobsConfig() {
-        return jobsConfig.getCustomConfigFile();
+    public CustomConfigurationInterface getJobsConfig() {
+        return jobsConfig;
     }
 
     public SQLInterface getSQLInterface() {
@@ -111,5 +119,9 @@ public class Main extends JavaPlugin {
 
     public Display getJobsInfoDisplay() {
         return jobsInfoDisplay;
+    }
+
+    public OpenedGUI getOpenedGUI() {
+        return openedGUI;
     }
 }

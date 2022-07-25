@@ -2,6 +2,10 @@ package be.elgem.Jobs.Jobs;
 
 import be.elgem.Jobs.Misc.AmountOfXp;
 import be.elgem.Jobs.Misc.EWayToXP;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
 
@@ -10,6 +14,8 @@ import java.util.HashMap;
  */
 public class Job {
     private String jobName;
+
+    private ItemStack displayItem;
 
     private short maxLevel;
     private int experienceGrowth;
@@ -24,10 +30,16 @@ public class Job {
      */
     private HashMap<EWayToXP, HashMap<String, AmountOfXp>> xpSources;
 
-//    private HashMap<Integer, ItemStack> reward; TODO
+//    private HashMap<Integer, ItemStack> reward; TODO système de récompense
 
-    public Job(String jobName, short maxLevel, int firstLevelExperience, int experienceGrowth) {
+    public Job(String jobName, ItemStack displayItem, short maxLevel, int firstLevelExperience, int experienceGrowth) {
         this.jobName = jobName;
+
+        this.displayItem = displayItem;
+
+        ItemMeta meta = this.displayItem.getItemMeta();
+        meta.setDisplayName(ChatColor.BOLD + jobName);
+        this.displayItem.setItemMeta(meta);
 
         this.maxLevel = maxLevel;
         this.experienceGrowth = experienceGrowth;
@@ -73,4 +85,16 @@ public class Job {
         return jobName;
     }
 
+    public ItemStack getDisplayItem() {
+        return displayItem;
+    }
+
+    public void setDisplayItem(Material newIcon) {
+        JobEditor.changeIcon(jobName, newIcon);
+
+        this.displayItem = new ItemStack(newIcon);
+        ItemMeta meta = this.displayItem.getItemMeta();
+        meta.setDisplayName(ChatColor.BOLD + jobName);
+        this.displayItem.setItemMeta(meta);
+    }
 }

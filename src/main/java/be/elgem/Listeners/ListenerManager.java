@@ -3,7 +3,6 @@ package be.elgem.Listeners;
 import be.elgem.Main;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
@@ -32,6 +31,10 @@ public class ListenerManager {
         listeners.add(new PlayerJoinAndQuit());
 
         listeners.add(new BlockBreakListener());
+
+        listeners.add(new InventoryListener());
+
+        listeners.add(new ItemUseListener());
     }
 
     private void registerListeners() {

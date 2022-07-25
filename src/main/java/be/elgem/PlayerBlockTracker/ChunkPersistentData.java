@@ -3,7 +3,6 @@ package be.elgem.PlayerBlockTracker;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -20,6 +19,7 @@ public class ChunkPersistentData {
     private ArrayList<Location> blockLocationArrayList;
 
     public ChunkPersistentData(Chunk chunk) {
+        // TODO faire en sorte que les blocs cassés d'une autre manière que par le minage d'un joueur ne soit plus traqué + régler bug lors de pousse bone meal le tronc qui apparâit là où on a bone meal ne donne pas d'xp
         this.chunk = chunk;
 
         this.persistentDataContainer = chunk.getPersistentDataContainer();
@@ -50,7 +50,7 @@ public class ChunkPersistentData {
         blockLocationArrayList = new ArrayList<>();
 
         for (int blockLocation : location) {
-            blockLocationArrayList.add(intToLocation(chunk.getWorld(), blockLocation));
+            blockLocationArrayList.add(ChunkUtils.getLocationFromInt(chunk.getWorld(), chunk, blockLocation));
         }
     }
 
@@ -58,28 +58,10 @@ public class ChunkPersistentData {
         int[] intLocations = new int[blockLocationArrayList.size()];
 
         for (int i = 0; i < blockLocationArrayList.size(); i++) {
-            intLocations[i] = locationToInt(blockLocationArrayList.get(i));
+            intLocations[i] = ChunkUtils.getIntFromLocation(blockLocationArrayList.get(i));
         }
 
         this.persistentDataContainer.set(playerBlocks, PersistentDataType.INTEGER_ARRAY, intLocations);
     }
 
-    private int locationToInt(Location location) { //Fonctionne
-        int chunkX = ((location.getBlockX() % 16) + 16) % 16; //Pour les chunks négatifs
-        int chunkZ = ((location.getBlockZ() % 16) + 16) % 16;
-        int chunkY = location.getBlockY();
-
-        return (chunkX<<24) | (chunkZ<<16) | (chunkY);
-    }
-
-    private Location intToLocation(World world, int location) {
-        int chunkX = (location>>24) & 0xF;
-        int chunkZ = (location>>16) & 0xF;
-        int chunkY = (location & 0x00FF);
-
-        chunkX += chunk.getX() * 16;
-        chunkZ += chunk.getZ() * 16;
-
-        return new Location(world, chunkX, chunkY, chunkZ);
-    }
 }

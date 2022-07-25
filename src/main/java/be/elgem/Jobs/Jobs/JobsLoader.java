@@ -4,8 +4,10 @@ import be.elgem.Jobs.Misc.AmountOfXp;
 import be.elgem.Jobs.Misc.EWayToXP;
 import be.elgem.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -19,14 +21,9 @@ public class JobsLoader {
     private Configuration pluginConfig;
 
     public JobsLoader() {
-        this.pluginConfig = Main.getMain().getJobsConfig();
+        this.pluginConfig = Main.getMain().getJobsConfig().getCustomConfigFile();
 
         loadJobs();
-
-//        for (Job job: jobsArray) {
-//            System.out.println(job.getJobName());
-//            System.out.println(job.getXpFor(EWayToXP.BREAK, "minecraft:oak_log", 10));
-//        }
     }
 
     private void loadJobs() {
@@ -38,8 +35,9 @@ public class JobsLoader {
             short maxLevel = (short) jobSection.getInt("max_level");
             int firstLevelExperience = jobSection.getInt("first_level_experience");
             int experienceGrowth = jobSection.getInt("experience_growth");
+            ItemStack displayItem = new ItemStack(Material.matchMaterial(jobSection.getString("display")));
 
-            Job currentlyCreatingJob = new Job(jobsName, maxLevel, firstLevelExperience, experienceGrowth);
+            Job currentlyCreatingJob = new Job(jobsName, displayItem, maxLevel, firstLevelExperience, experienceGrowth);
 
             loadWayToXp(currentlyCreatingJob, jobSection.getConfigurationSection("experience_sources"));
 
