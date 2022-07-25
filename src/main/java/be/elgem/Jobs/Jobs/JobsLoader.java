@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.logging.Level;
 
 /**
@@ -26,18 +27,19 @@ public class JobsLoader {
         loadJobs();
     }
 
-    private void loadJobs() {
+    public void loadJobs() {
         jobsArray = new ArrayList<>();
 
-        for (String jobsName : pluginConfig.getKeys(false)) {
-            ConfigurationSection jobSection = pluginConfig.getConfigurationSection(jobsName);
+        for (String uuid : pluginConfig.getKeys(false)) {
+            ConfigurationSection jobSection = pluginConfig.getConfigurationSection(uuid);
 
+            String jobName = jobSection.getString("name");
             short maxLevel = (short) jobSection.getInt("max_level");
             int firstLevelExperience = jobSection.getInt("first_level_experience");
             int experienceGrowth = jobSection.getInt("experience_growth");
-            ItemStack displayItem = new ItemStack(Material.matchMaterial(jobSection.getString("display")));
+            Material displayItem = Material.matchMaterial(jobSection.getString("icon"));
 
-            Job currentlyCreatingJob = new Job(jobsName, displayItem, maxLevel, firstLevelExperience, experienceGrowth);
+            Job currentlyCreatingJob = new Job(UUID.fromString(uuid), jobName, displayItem, maxLevel, firstLevelExperience, experienceGrowth);
 
             loadWayToXp(currentlyCreatingJob, jobSection.getConfigurationSection("experience_sources"));
 
@@ -95,9 +97,9 @@ public class JobsLoader {
         return jobsArray;
     }
 
-    public Job getJobByName(String jobName) {
+    public Job getJobByUUID(UUID uuid) {
         for (Job job : jobsArray) {
-            if (job.getJobName().equals(jobName)){
+            if (job.getJobUUID().equals(uuid)){
                 return job;
             }
         }

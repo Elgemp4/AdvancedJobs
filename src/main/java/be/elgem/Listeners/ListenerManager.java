@@ -12,8 +12,6 @@ public class ListenerManager {
 
     ArrayList<Listener> listeners;
 
-    ChunkLoadingListener chunkLoadingListener;
-
     public ListenerManager() {
         main = Main.getMain();
 
@@ -35,6 +33,8 @@ public class ListenerManager {
         listeners.add(new InventoryListener());
 
         listeners.add(new ItemUseListener());
+
+        listeners.add(new ChatListener());
     }
 
     private void registerListeners() {

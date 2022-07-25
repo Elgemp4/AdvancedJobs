@@ -11,6 +11,8 @@ public class InventoryListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
+        if(Main.getMain().getOpenedGUI().getGUI(player) == null) {return;}
+
         if(event.getInventory().equals(Main.getMain().getOpenedGUI().getGUI(player).getMenu())) {
             event.setCancelled(true);
             Main.getMain().getOpenedGUI().getGUI((Player) event.getWhoClicked()).executeActionForClick(event.getSlot());

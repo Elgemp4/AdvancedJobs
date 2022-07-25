@@ -2,12 +2,10 @@ package be.elgem.Jobs.Jobs;
 
 import be.elgem.Jobs.Misc.AmountOfXp;
 import be.elgem.Jobs.Misc.EWayToXP;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Represent a single job
@@ -15,7 +13,9 @@ import java.util.HashMap;
 public class Job {
     private String jobName;
 
-    private ItemStack displayItem;
+    private UUID jobUUID;
+
+    private Material icon;
 
     private short maxLevel;
     private int experienceGrowth;
@@ -32,14 +32,12 @@ public class Job {
 
 //    private HashMap<Integer, ItemStack> reward; TODO système de récompense
 
-    public Job(String jobName, ItemStack displayItem, short maxLevel, int firstLevelExperience, int experienceGrowth) {
+    public Job(UUID uuid, String jobName, Material icon, short maxLevel, int firstLevelExperience, int experienceGrowth) {
+        this.jobUUID = uuid;
+
         this.jobName = jobName;
 
-        this.displayItem = displayItem;
-
-        ItemMeta meta = this.displayItem.getItemMeta();
-        meta.setDisplayName(ChatColor.BOLD + jobName);
-        this.displayItem.setItemMeta(meta);
+        this.icon = icon;
 
         this.maxLevel = maxLevel;
         this.experienceGrowth = experienceGrowth;
@@ -65,10 +63,6 @@ public class Job {
         }
     }
 
-    public Job(String jobName) {
-        this.jobName = jobName;
-    }
-
     public short getMaxLevel() {
         return maxLevel;
     }
@@ -85,16 +79,23 @@ public class Job {
         return jobName;
     }
 
-    public ItemStack getDisplayItem() {
-        return displayItem;
+    public UUID getJobUUID() {
+        return jobUUID;
     }
 
-    public void setDisplayItem(Material newIcon) {
-        JobEditor.changeIcon(jobName, newIcon);
+    public Material getIcon() {
+        return icon;
+    }
 
-        this.displayItem = new ItemStack(newIcon);
-        ItemMeta meta = this.displayItem.getItemMeta();
-        meta.setDisplayName(ChatColor.BOLD + jobName);
-        this.displayItem.setItemMeta(meta);
+    public void setIcon(Material newIcon) {
+        JobEditor.changeIcon(jobUUID, newIcon);
+
+        this.icon = newIcon;
+    }
+
+    public void setJobName(String newName) {
+        JobEditor.changeName(jobUUID, newName);
+
+        this.jobName = newName;
     }
 }
