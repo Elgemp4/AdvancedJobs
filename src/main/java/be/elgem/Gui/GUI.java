@@ -6,10 +6,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 
 public abstract class GUI {
@@ -31,7 +34,18 @@ public abstract class GUI {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setDisplayName(ChatColor.RESET + "" + ChatColor.WHITE + name);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         itemStack.setItemMeta(itemMeta);
+        return itemStack;
+    }
+
+    public ItemStack createSkull(String name, String uuid) {
+        ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta itemMeta = (SkullMeta) itemStack.getItemMeta();
+        itemMeta.setDisplayName(ChatColor.RESET + "" + ChatColor.WHITE + name);
+        itemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
+        itemStack.setItemMeta(itemMeta);
+
         return itemStack;
     }
 
@@ -54,6 +68,10 @@ public abstract class GUI {
     public void openInventory() {
         Main.getMain().getOpenedGUI().addGUI(player, this);
         player.openInventory(menu);
+    }
+
+    protected void clearActions() {
+        actionsForItems.clear();
     }
 
     public Inventory getMenu() {

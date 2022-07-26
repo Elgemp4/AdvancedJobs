@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class EditJobChooserGUI extends GUI{
+    private int numberOfPages = 1;
+    private int currentPage = 0;
+
     public EditJobChooserGUI(Player player) {
         super(player, 27, ChatColor.RED + "Choisissez le métier à modifier");
 
@@ -20,6 +23,9 @@ public class EditJobChooserGUI extends GUI{
 
     @Override
     protected void createInventory() {
+        this.menu.clear();
+        this.clearActions();
+
         ItemStack blackGlassPane = createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE);;
 
         for (int row = 0; row <= 2; row+=2) {
@@ -30,14 +36,38 @@ public class EditJobChooserGUI extends GUI{
 
         ArrayList<Job> jobs = Main.getMain().getJobsLoader().getJobsArray();
 
-        for (int i = 0; i < jobs.size(); i++) {
+        numberOfPages = (int) Math.ceil((jobs.size() + 1) / 9.0); //+1 is for the job create button
+
+        int firstDisplayedJob = currentPage * 9;
+        int lastDisplayedJob = Math.min(firstDisplayedJob + 9, jobs.size());
+
+        for (int i = firstDisplayedJob; i < lastDisplayedJob; i++) {
             Job job = jobs.get(i);
-            addItem(9 + i, createItemStack(job.getJobName(), job.getIcon()), () -> {
-                new ModificationTypeSelector(player, job).openInventory();
-            });
+
+            int index = 9 + (i % 9);
+
+            addItem(index, createItemStack(job.getJobName(), job.getIcon()), () -> new ModificationTypeSelector(player, job).openInventory());
         }
 
-        addItem(9 + jobs.size(), createItemStack("Créer un nouveau métier", Material.PAPER), this::createJob);
+        if(lastDisplayedJob == jobs.size()) {
+            int index = 9 + (lastDisplayedJob % 9);
+
+            if(menu.getItem(index) == null){
+                addItem( index, createItemStack("Créer un métier", Material.PAPER), this::createJob);
+            }
+        }
+
+        if(numberOfPages > 1) {
+            if(currentPage > 0) {
+                addItem(20, createItemStack("Page précédente", Material.ARROW), this::previousPage);
+            }
+
+            addItem(22, createItemStack("Page " + (currentPage + 1) + "/" + (numberOfPages), Material.PAPER), null);
+
+            if(currentPage + 1 != numberOfPages) {
+                addItem(24, createItemStack("Page suivante", Material.ARROW), this::nextPage);
+            }
+        }
     }
 
     public void createJob() {
@@ -52,8 +82,16 @@ public class EditJobChooserGUI extends GUI{
 
         Main.getMain().getJobsLoader().loadJobs();
 
-        player.closeInventory();
+        this.createInventory();
+    }
 
-        new EditJobChooserGUI(player).openInventory();
+    private void nextPage() {
+        currentPage++;
+        createInventory();
+    }
+
+    private void previousPage() {
+        currentPage--;
+        createInventory();
     }
 }

@@ -71,4 +71,9 @@ public class JobEditor {
     }
 
 
+    public static void deleteJob(UUID jobUUID) {
+        CustomConfigurationInterface customConfigurationInterface = Main.getMain().getJobsConfig();
+        customConfigurationInterface.getCustomConfigFile().set(jobUUID.toString(), null);
+        customConfigurationInterface.saveConfiguration();
+    }
 }

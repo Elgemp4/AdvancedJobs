@@ -98,4 +98,22 @@ public class Job {
 
         this.jobName = newName;
     }
+
+    public void setFirstLevelExperience(int newFirstLevelExperience) {
+        JobEditor.changeFirstLevelExperience(jobUUID, newFirstLevelExperience);
+        
+        this.firstLevelExperience = newFirstLevelExperience;
+    }
+
+    public void setExperienceGrowth(int newExperienceGrowth) {
+        JobEditor.changeExperienceGrowth(jobUUID, newExperienceGrowth);
+
+        this.experienceGrowth = newExperienceGrowth;
+    }
+
+    public void setMaxLevel(int newMaxLevel) {
+        JobEditor.changeMaxLevel(jobUUID, newMaxLevel);
+
+        this.maxLevel = (short) newMaxLevel;
+    }
 }
