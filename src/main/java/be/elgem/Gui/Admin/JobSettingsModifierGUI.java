@@ -1,5 +1,6 @@
-package be.elgem.Gui;
+package be.elgem.Gui.Admin;
 
+import be.elgem.Gui.GUI;
 import be.elgem.Jobs.Jobs.Job;
 import be.elgem.Jobs.Jobs.JobEditor;
 import be.elgem.Main;
@@ -11,12 +12,8 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
-public class JobSettingsModifierGUI extends GUI{
+public class JobSettingsModifierGUI extends GUI {
     Job jobToModify;
-
-    private boolean isChoosingAnItem = false;
-    private boolean isInputing = false;
-    private String inputDestination = "";
 
     public JobSettingsModifierGUI(Player player, Job jobToModify) {
         super(player, 27, ChatColor.RED + "Paramètres de " + jobToModify.getJobName());
@@ -36,12 +33,12 @@ public class JobSettingsModifierGUI extends GUI{
             }
         }
 
-        addItem(9, createItemStack("Changer l'icône du métier", jobToModify.getIcon()), this::activateItemSelection);
-        addItem(10, createItemStack("Changer le nom du métier", Material.NAME_TAG), () -> activateChatInput("name", "Entrez le nouveau nom du métier : "));
-        addItem(11, createItemStack("Changer l'expérience du premier niveau (" + jobToModify.getFirstLevelExperience() + " xp)", Material.EXPERIENCE_BOTTLE), () -> activateChatInput("firstLevelExperience", "Entrez l'expérience du premier niveau : "));
-        addItem(12, createItemStack("Changer l'expérience de chaque niveau (" + jobToModify.getExperienceGrowth() + " xp)", Material.EXPERIENCE_BOTTLE), () -> activateChatInput("experienceGrowth", "Entrez l'expérience de chaque niveau : "));
-        addItem(13, createItemStack("Changer le niveau maximum (Niveau " + jobToModify.getMaxLevel() + ")", Material.EXPERIENCE_BOTTLE), () -> activateChatInput("maxLevel", "Entrez le niveau maximum : "));
-        addItem(14, createItemStack("Supprimer le métier", Material.BARRIER), () -> activateChatInput("delete", "Vous êtes sur le point de supprimer le métier " + jobToModify.getJobName() + ". Confirmez-vous ? (Oui / Non)"));
+        addItem(9, createItemStack("Changer l'icône du métier", jobToModify.getIcon()), () -> startWaitingForItemSelection("Cliquez sur l'objet que vous voulez définir comme icône", "icon"));
+        addItem(10, createItemStack("Changer le nom du métier", Material.NAME_TAG), () -> startWaitingForInput( "Entrez le nouveau nom du métier : ", "name"));
+        addItem(11, createItemStack("Changer l'expérience du premier niveau (" + jobToModify.getFirstLevelExperience() + " xp)", Material.EXPERIENCE_BOTTLE), () -> startWaitingForInput("Entrez l'expérience du premier niveau : ", "firstLevelExperience"));
+        addItem(12, createItemStack("Changer l'expérience de chaque niveau (" + jobToModify.getExperienceGrowth() + " xp)", Material.EXPERIENCE_BOTTLE), () -> startWaitingForInput("Entrez l'expérience de chaque niveau : ", "experienceGrowth"));
+        addItem(13, createItemStack("Changer le niveau maximum (Niveau " + jobToModify.getMaxLevel() + ")", Material.EXPERIENCE_BOTTLE), () -> startWaitingForInput("Entrez le niveau maximum : ", "maxLevel"));
+        addItem(14, createItemStack("Supprimer le métier", Material.BARRIER), () -> startWaitingForInput("Vous êtes sur le point de supprimer le métier " + jobToModify.getJobName() + ". Confirmez-vous ? (Oui / Non)", "delete"));
 
         ItemStack arrow = createItemStack("Retour", Material.TIPPED_ARROW);
         PotionMeta meta = (PotionMeta) arrow.getItemMeta();
@@ -51,65 +48,65 @@ public class JobSettingsModifierGUI extends GUI{
         addItem(18, arrow, () -> new ModificationTypeSelector(player, jobToModify).openInventory());
     }
 
-    public boolean isChoosingAnItem() {
-        return isChoosingAnItem;
-    }
-
-    public boolean isInputing() {
-        return isInputing;
-    }
 
     public void setNewIcon(Material newIcon) {
         jobToModify.setIcon(newIcon);
 
-        addItem(9, createItemStack("Changer l'icône du métier", newIcon), this::activateItemSelection);
-
-        isChoosingAnItem = false;
+        addItem(9, createItemStack("Changer l'icône du métier", newIcon), () -> startWaitingForItemSelection("Cliquez sur l'objet que vous voulez définir comme icône", "icon"));
     }
 
+    @Override
+    public void computeSelectedItem(ItemStack item) {
+        switch (itemSelectionDestination) {
+            case "icon":
+                setNewIcon(item.getType());
+                break;
+        }
+    }
 
-    public void sendInput(String message) {
+    @Override
+    public void computeInput(String input) {
         boolean ignoreInterfaceReset = false;
 
         switch (inputDestination) {
             case "name":
-                jobToModify.setJobName(message);
+                jobToModify.setJobName(input);
                 break;
             case "firstLevelExperience":
                 try {
-                    jobToModify.setFirstLevelExperience(Integer.parseInt(message));
+                    jobToModify.setFirstLevelExperience(Integer.parseInt(input));
                 } catch (NumberFormatException e) {
                     player.sendMessage(ChatColor.RED + "Veuillez entrer un nombre correct !");
                 }
                 break;
             case "experienceGrowth":
                 try {
-                    jobToModify.setExperienceGrowth(Integer.parseInt(message));
+                    jobToModify.setExperienceGrowth(Integer.parseInt(input));
                 } catch (NumberFormatException e) {
                     player.sendMessage(ChatColor.RED + "Veuillez entrer un nombre correct !");
                 }
                 break;
             case "maxLevel":
                 try {
-                    jobToModify.setMaxLevel(Integer.parseInt(message));
+                    jobToModify.setMaxLevel(Integer.parseInt(input));
                 } catch (NumberFormatException e) {
                     player.sendMessage(ChatColor.RED + "Veuillez entrer un nombre correct !");
                 }
                 break;
             case "delete":
-                if(message.equalsIgnoreCase("oui")) {
+                if(input.equalsIgnoreCase("oui")) {
                     JobEditor.deleteJob(jobToModify.getJobUUID());
                     Main.getMain().getJobsLoader().loadJobs();
                     ignoreInterfaceReset = true;
                     player.sendMessage(ChatColor.RED + "Le métier " + jobToModify.getJobName() + " a été supprimé avec succès !");
                 }
-                else if(message.equalsIgnoreCase("non")) {
+                else if(input.equalsIgnoreCase("non")) {
                     player.sendMessage(ChatColor.RED + "Annulation de la suppression du métier");
 
                 }
                 else {
                     player.sendMessage(ChatColor.RED + "Veuillez entrer 'oui' ou 'non' : ");
-                    activateChatInput("delete", "Vous êtes sur le point de supprimer le métier " + jobToModify.getJobName() + ". Confirmez-vous ? (Oui / Non)");
+                    startWaitingForInput("Vous êtes sur le point de supprimer le métier " + jobToModify.getJobName() + ". Confirmez-vous ? (Oui / Non)", "delete");
                     ignoreInterfaceReset = true;
                 }
         }
@@ -117,22 +114,5 @@ public class JobSettingsModifierGUI extends GUI{
         if(!ignoreInterfaceReset) {
             new JobSettingsModifierGUI(player, jobToModify).openInventory();
         }
-
     }
-
-    private void activateItemSelection() {
-        isChoosingAnItem = true;
-        player.closeInventory();
-        player.sendMessage("[Jobs] Faites un clique droit avec l'objet que vous souhaitez définir comme icône.");
-    }
-
-    private void activateChatInput(String destination, String message) {
-        player.sendMessage(ChatColor.RED + "[Jobs] " + message);
-
-        isInputing = true;
-        inputDestination = destination;
-        player.closeInventory();
-    }
-
-
 }

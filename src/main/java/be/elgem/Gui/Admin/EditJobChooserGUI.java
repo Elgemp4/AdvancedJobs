@@ -1,5 +1,6 @@
-package be.elgem.Gui;
+package be.elgem.Gui.Admin;
 
+import be.elgem.Gui.GUI;
 import be.elgem.Jobs.Jobs.Job;
 import be.elgem.Jobs.Jobs.JobEditor;
 import be.elgem.Main;
@@ -11,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class EditJobChooserGUI extends GUI{
+public class EditJobChooserGUI extends GUI {
     private int numberOfPages = 1;
     private int currentPage = 0;
 
@@ -93,5 +94,15 @@ public class EditJobChooserGUI extends GUI{
     private void previousPage() {
         currentPage--;
         createInventory();
+    }
+
+    @Override
+    public void computeSelectedItem(ItemStack item) {
+
+    }
+
+    @Override
+    public void computeInput(String input) {
+
     }
 }

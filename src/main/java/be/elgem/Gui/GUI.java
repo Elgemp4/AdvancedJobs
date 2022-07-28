@@ -22,6 +22,12 @@ public abstract class GUI {
 
     protected HashMap<Integer, Runnable> actionsForItems;
 
+    protected boolean isWaitingForInput = false;
+    protected String inputDestination = "";
+
+    protected boolean isWaitingForItemSelection = false;
+    protected String itemSelectionDestination = "";
+
     public GUI(Player player, int size, String title) {
         this.player = player;
 
@@ -63,8 +69,6 @@ public abstract class GUI {
         }
     }
 
-    protected abstract void createInventory();
-
     public void openInventory() {
         Main.getMain().getOpenedGUI().addGUI(player, this);
         player.openInventory(menu);
@@ -77,4 +81,60 @@ public abstract class GUI {
     public Inventory getMenu() {
         return menu;
     }
+
+    /**
+     * Start waiting for the player input
+     * @param message The message to display to the player
+     * @param destination An identifier to know to what the input is bound to
+     */
+    protected void startWaitingForInput(String message, String destination) {
+        isWaitingForInput = true;
+        inputDestination = destination;
+
+        if(!message.equals("")) {
+            player.sendMessage(message);
+        }
+
+        player.closeInventory();
+    }
+
+    /**
+     * Start waiting for the player to choose an item
+     * @param message The message to display to the player
+     * @param destination An identifier to know to what the item is bound to
+     */
+    protected void startWaitingForItemSelection(String message, String destination) {
+        isWaitingForItemSelection = true;
+        itemSelectionDestination = destination;
+
+        if(!message.equals("")) {
+            player.sendMessage(message);
+        }
+        player.closeInventory();
+    }
+
+
+    public boolean isWaitingForInput() {
+        return isWaitingForInput;
+    }
+
+    public boolean isWaitingForItemSelection() {
+        return isWaitingForItemSelection;
+    }
+
+    protected abstract void createInventory();
+
+    public void getInput(String input) {
+        this.openInventory();
+        computeInput(input);
+    }
+
+    public void getItemSelection(ItemStack itemStack) {
+        this.openInventory();
+        computeSelectedItem(itemStack);
+    }
+
+    protected abstract void computeSelectedItem(ItemStack item);
+
+    protected abstract void computeInput(String input);
 }

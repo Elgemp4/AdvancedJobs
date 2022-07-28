@@ -6,3 +6,26 @@ api-version: 1.16
 commands:
   jobs:
     description: Access to all command related to AdvancedJobs
+
+permissions:
+  jobs.*:
+    decription: Grant access to all features related to jobs plugin
+    children:
+      jobs.admin: true
+      jobs.user: true
+
+    jobs.admin:
+      description: Grant access to all admin commands
+      children:
+        jobs.admin.create: true
+        jobs.admin.delete: true
+        jobs.admin.changeName: true
+        jobs.admin.changeFirstLevelXP: true
+        jobs.admin.changeXPPerLevel: true
+        jobs.admin.changeMaxLevel: true
+        jobs.admin.changeWayToXp: true
+
+    jobs.user:
+      description: Grant access to all user commands
+      children:
+        jobs.user.jobsTop: true

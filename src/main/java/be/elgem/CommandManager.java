@@ -1,13 +1,17 @@
 package be.elgem;
 
-import be.elgem.Gui.EditJobChooserGUI;
+import be.elgem.Gui.Admin.EditJobChooserGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-public class CommandManager implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.List;
+
+public class CommandManager implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
         if(!(commandSender instanceof Player)) {return false;}
@@ -24,5 +28,14 @@ public class CommandManager implements CommandExecutor {
         }
 
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender commandSender, Command command, String label, String[] args) {
+        if(!label.equals("jobs")){return null;}
+
+        ArrayList<String> completions = new ArrayList<>();
+        completions.add("edit");
+        return completions;
     }
 }

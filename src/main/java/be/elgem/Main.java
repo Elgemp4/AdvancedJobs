@@ -64,6 +64,7 @@ public class Main extends JavaPlugin {
         commandManager = new CommandManager();
 
         this.getCommand("jobs").setExecutor(commandManager);
+        this.getCommand("jobs").setTabCompleter(commandManager);
 
         loadConnectedPlayer();
 
