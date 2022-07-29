@@ -36,6 +36,10 @@ public abstract class GUI {
         menu = Bukkit.createInventory(player, size, title);
     }
 
+    public static ItemStack createItemStack(Material material) {
+        return new ItemStack(material);
+    }
+
     public static ItemStack createItemStack(String name, Material material) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -70,6 +74,8 @@ public abstract class GUI {
     }
 
     public void openInventory() {
+        menu.clear();
+        createInventory();
         Main.getMain().getOpenedGUI().addGUI(player, this);
         player.openInventory(menu);
     }
@@ -127,11 +133,13 @@ public abstract class GUI {
     public void getInput(String input) {
         this.openInventory();
         computeInput(input);
+        isWaitingForInput = false;
     }
 
     public void getItemSelection(ItemStack itemStack) {
         this.openInventory();
         computeSelectedItem(itemStack);
+        isWaitingForItemSelection = false;
     }
 
     protected abstract void computeSelectedItem(ItemStack item);

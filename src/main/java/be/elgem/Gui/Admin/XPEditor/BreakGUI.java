@@ -1,34 +1,34 @@
 package be.elgem.Gui.Admin.XPEditor;
 
 import be.elgem.Jobs.Jobs.Job;
+import be.elgem.Jobs.Misc.AmountOfXp;
 import be.elgem.Jobs.Misc.EWayToXP;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
 public class BreakGUI extends XPEditorInsertGUI{
-    public BreakGUI(Player player, EWayToXP wayToXP, String action, Job editedJob) {
-        super(player, wayToXP, editedJob);
+    public BreakGUI(Player player, Job editedJob) {
+        super(player, EWayToXP.BREAK, editedJob);
     }
 
     @Override
-    protected void isAValidAction() {
-
+    protected boolean isAValidXpSource(Object xpSource) {
+        if(!(xpSource instanceof ItemStack)) {return false;}
+        ItemStack item = (ItemStack) xpSource;
+        return item.getType().isBlock();
     }
 
     @Override
-    protected HashMap<ItemStack, String> loadAction() {
-        return null;
-    }
+    protected HashMap<ItemStack, String> loadXpSources() {
+        HashMap<ItemStack, String> xpSources =  new HashMap<>();
 
-    @Override
-    public void computeSelectedItem(ItemStack item) {
+        for (String xpSource : jobToModify.getXpSources(EWayToXP.BREAK)) {
+            xpSources.put(createItemStack(Material.valueOf(xpSource)), xpSource);
+        }
 
-    }
-
-    @Override
-    public void computeInput(String input) {
-
+        return xpSources;
     }
 }

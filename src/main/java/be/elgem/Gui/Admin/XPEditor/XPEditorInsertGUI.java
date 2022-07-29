@@ -21,9 +21,13 @@ public abstract class XPEditorInsertGUI extends GUI {
     public XPEditorInsertGUI(Player player, EWayToXP wayToXP, Job editedJob) {
         super(player, 54, "Editeur de l'action " + wayToXP.toString());
 
+        this.wayToXP = wayToXP;
+
         this.player = player;
 
         this.jobToModify = editedJob;
+
+        createInventory();
     }
 
     @Override
@@ -32,30 +36,51 @@ public abstract class XPEditorInsertGUI extends GUI {
             addItem(i, createItemStack(" ", Material.GREEN_STAINED_GLASS_PANE), null);
         }
 
-        for (int i = 48; i < 54; i++) {
+        for (int i = 45; i < 54; i++) {
             addItem(i, createItemStack(" ", Material.GREEN_STAINED_GLASS_PANE), null);
         }
 
         addItem(4, createItemStack("Ajouter moyen d'xp", Material.HOPPER), () -> startWaitingForItemSelection("[Jobs] Faites un clique droit avec l'object que vous voulez ajouter : ", "newXpSource"));
 
-        addItem(48, createItemStack("Retour", Material.TIPPED_ARROW), () -> new ModificationTypeSelector(player, jobToModify).openInventory());
+        addItem(45, createItemStack("Retour", Material.TIPPED_ARROW), () -> new ModificationTypeSelector(player, jobToModify).openInventory());
 
-        HashMap<ItemStack, String> actions = loadAction();
+        HashMap<ItemStack, String> actions = loadXpSources();
 
 
-        ItemStack[] items = (ItemStack[]) actions.keySet().toArray();
+
+        Object[] items = actions.keySet().toArray();
         for (int i = 0; i < actions.size(); i++) {
-            ItemStack itemStack = items[i];
+            ItemStack itemStack = (ItemStack) items[i];
 
             addItem(i + 9, itemStack, () -> {
                 String actionToEdit = actions.get(itemStack);
 
-                new WayToXPEditor(player, wayToXP, actionToEdit, jobToModify).openInventory();
+                new XpSourceEditor(player, wayToXP, actionToEdit, jobToModify).openInventory();
             });
         }
     }
 
-    protected abstract void isAValidAction();
+    protected abstract boolean isAValidXpSource(Object xpSource);
 
-    protected abstract HashMap<ItemStack, String> loadAction();
+    protected abstract HashMap<ItemStack, String> loadXpSources();
+
+
+    @Override
+    public void computeSelectedItem(ItemStack item) {
+        switch (itemSelectionDestination) {
+            case "newXpSource":
+                if (isAValidXpSource(item)) {
+                    jobToModify.addXpSource(wayToXP, item.getType().toString(), null);
+                    openInventory();
+                } else {
+                    player.sendMessage("[Jobs] Ce n'est pas un moyen d'xp valide.");
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void computeInput(String input) {
+
+    }
 }

@@ -12,6 +12,9 @@ public class ChatListener implements Listener {
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         GUI gui = Main.getMain().getOpenedGUI().getGUI(event.getPlayer());
+
+        if(gui == null) {return;}
+
         if(gui.isWaitingForInput()) {
             event.setCancelled(true);
             Bukkit.getScheduler().runTaskLater(Main.getMain(), () -> gui.getInput(event.getMessage()), 1);

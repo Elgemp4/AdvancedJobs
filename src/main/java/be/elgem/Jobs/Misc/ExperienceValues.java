@@ -25,4 +25,8 @@ public class ExperienceValues {
     public int getMax() {
         return max;
     }
+
+    public boolean isSingleValue() {
+        return min == max;
+    }
 }

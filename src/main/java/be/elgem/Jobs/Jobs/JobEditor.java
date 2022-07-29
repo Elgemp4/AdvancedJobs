@@ -1,11 +1,15 @@
 package be.elgem.Jobs.Jobs;
 
 import be.elgem.Configuration.CustomConfigurationInterface;
+import be.elgem.Jobs.Misc.AmountOfXp;
+import be.elgem.Jobs.Misc.EWayToXP;
+import be.elgem.Jobs.Misc.ExperienceValues;
 import be.elgem.Main;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.TreeMap;
 import java.util.UUID;
 
 public class JobEditor {
@@ -74,6 +78,30 @@ public class JobEditor {
     public static void deleteJob(UUID jobUUID) {
         CustomConfigurationInterface customConfigurationInterface = Main.getMain().getJobsConfig();
         customConfigurationInterface.getCustomConfigFile().set(jobUUID.toString(), null);
+        customConfigurationInterface.saveConfiguration();
+    }
+
+    public static void addXpSource(UUID jobUUID, EWayToXP wayToXp, String experienceSource, AmountOfXp amountOfXp) {
+        CustomConfigurationInterface customConfigurationInterface = Main.getMain().getJobsConfig();
+        ConfigurationSection jobConfig = customConfigurationInterface.getCustomConfigFile().getConfigurationSection(jobUUID.toString() + ".experience_sources");
+
+        jobConfig.createSection(wayToXp.toString() + "." + experienceSource);
+
+        if(amountOfXp != null) {
+            TreeMap<Integer, ExperienceValues> xpValues = amountOfXp.getAmountOfXpPerLevel();
+
+            for (int level : xpValues.keySet()) {
+                ExperienceValues values = xpValues.get(level);
+                if(values.isSingleValue()){
+                    jobConfig.set(wayToXp + "." + experienceSource + "." + level, values.getMin());
+                }
+                else{
+                    jobConfig.set(wayToXp + "." + experienceSource + "." + level, values.getMin() + " / " + values.getMax());
+                }
+            }
+        }
+
+
         customConfigurationInterface.saveConfiguration();
     }
 }

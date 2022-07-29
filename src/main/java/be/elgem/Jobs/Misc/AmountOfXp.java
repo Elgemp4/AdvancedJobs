@@ -34,4 +34,8 @@ public class AmountOfXp {
 
         return 0;
     }
+
+    public TreeMap<Integer, ExperienceValues> getAmountOfXpPerLevel() {
+        return amountOfXpPerLevel;
+    }
 }

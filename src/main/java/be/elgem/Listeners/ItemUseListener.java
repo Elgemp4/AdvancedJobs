@@ -15,6 +15,8 @@ public class ItemUseListener implements Listener {
 
         GUI gui = Main.getMain().getOpenedGUI().getGUI(event.getPlayer());
 
+        if(gui == null) {return;}
+
         if(gui.isWaitingForItemSelection()) {
             event.setCancelled(true);
 

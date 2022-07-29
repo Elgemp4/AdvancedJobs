@@ -7,14 +7,14 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class WayToXPEditor extends GUI {
+public class XpSourceEditor extends GUI {
     protected Player player;
 
     protected EWayToXP wayToXP;
 
     protected Job jobToModify;
 
-    public WayToXPEditor(Player player, EWayToXP wayToXP, String action, Job editedJob) {
+    public XpSourceEditor(Player player, EWayToXP wayToXP, String action, Job editedJob) {
         super(player, 27, "Editeur d'xp pour " + wayToXP.toString());
 
         this.player = player;

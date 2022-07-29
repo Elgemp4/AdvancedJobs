@@ -52,6 +52,8 @@ public class Job {
 
     public void addXpSource(EWayToXP wayToXP, String xpSource, AmountOfXp xpPerLevel){
         xpSources.get(wayToXP).put(xpSource, xpPerLevel);
+
+        JobEditor.addXpSource(jobUUID, wayToXP, xpSource, xpPerLevel);
     }
 
     public int getXpFor( EWayToXP wayToXP, String experienceSource, int playerLevel) {
@@ -115,5 +117,9 @@ public class Job {
         JobEditor.changeMaxLevel(jobUUID, newMaxLevel);
 
         this.maxLevel = (short) newMaxLevel;
+    }
+
+    public String[] getXpSources(EWayToXP wayToXP) {
+        return xpSources.get(wayToXP).keySet().toArray(new String[0]);
     }
 }

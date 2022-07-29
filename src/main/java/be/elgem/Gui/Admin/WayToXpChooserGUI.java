@@ -1,7 +1,11 @@
 package be.elgem.Gui.Admin;
 
+import be.elgem.Gui.Admin.XPEditor.BreakGUI;
+import be.elgem.Gui.Admin.XPEditor.XPEditorInsertGUI;
+import be.elgem.Gui.Admin.XPEditor.XpSourceEditor;
 import be.elgem.Gui.GUI;
 import be.elgem.Jobs.Jobs.Job;
+import be.elgem.Jobs.Misc.EWayToXP;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -28,7 +32,7 @@ public class WayToXpChooserGUI extends GUI {
             addItem(i, greenGlassPane, null);
         }
 
-        addItem(11, createItemStack("Casser", Material.NETHERITE_PICKAXE), null);
+        addItem(11, createItemStack("Casser", Material.NETHERITE_PICKAXE), () -> new BreakGUI(player, jobToModify).openInventory());
         addItem(12, createItemStack("Tuer", Material.NETHERITE_SWORD), null);
         addItem(13, createItemStack("Pêcher", Material.FISHING_ROD), null);
         addItem(14, createItemStack("Tondre", Material.SHEARS), null);
