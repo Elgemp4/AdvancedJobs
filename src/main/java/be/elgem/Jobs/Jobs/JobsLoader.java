@@ -1,13 +1,12 @@
 package be.elgem.Jobs.Jobs;
 
-import be.elgem.Jobs.Misc.AmountOfXp;
-import be.elgem.Jobs.Misc.EWayToXP;
+import be.elgem.Jobs.Misc.XpSteps;
+import be.elgem.Jobs.Misc.EXpMethod;
 import be.elgem.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -52,29 +51,29 @@ public class JobsLoader {
             ConfigurationSection experienceSources = wayToXpSection.getConfigurationSection(wayToXp);
 
             for (String experienceSource : experienceSources.getKeys(false)) {
-                EWayToXP eWayToXP = EWayToXP.valueOf(wayToXp);
+                EXpMethod eWayToXP = EXpMethod.valueOf(wayToXp);
 
-                AmountOfXp amountOfXp = loadAmountsOfXp(experienceSources.getConfigurationSection(experienceSource));
+                XpSteps amountOfXp = loadAmountsOfXp(experienceSources.getConfigurationSection(experienceSource));
 
                 currentlyCreatingJob.addXpSource(eWayToXP, experienceSource, amountOfXp);
             }
         }
     }
 
-    private AmountOfXp loadAmountsOfXp(ConfigurationSection amountOfXpSection) {
-        AmountOfXp amountOfXp = new AmountOfXp();
+    private XpSteps loadAmountsOfXp(ConfigurationSection amountOfXpSection) {
+        XpSteps amountOfXp = new XpSteps();
 
-        if(amountOfXpSection.getKeys(false).isEmpty()){ //Case of single XP for the whole job
-            String path = amountOfXpSection.getCurrentPath();
-            amountOfXp.addXpForLevel(0, pluginConfig.getInt(path));
-            return amountOfXp;
-        }
+//        if(amountOfXpSection.getKeys(false).isEmpty()){ //Case of single XP for the whole job
+//            String path = amountOfXpSection.getCurrentPath();
+//            amountOfXp.addXpForLevel(0, pluginConfig.getInt(path));
+//            return amountOfXp;
+//        }
 
         for (String requiredLevel : amountOfXpSection.getKeys(false)) {
             try{
                 int requiredLevelInt = Integer.parseInt(requiredLevel);
 
-                //Variable Experience
+                //Random Experience
                 if(amountOfXpSection.getString(requiredLevel).contains("/")) {
                     String[] xp = amountOfXpSection.getString(requiredLevel).replaceAll("\\s", "").split("/");
                     amountOfXp.addXpForLevel(requiredLevelInt, Integer.parseInt(xp[0]), Integer.parseInt(xp[1]));

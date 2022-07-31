@@ -1,7 +1,8 @@
 package be.elgem.Jobs.Jobs;
 
-import be.elgem.Jobs.Misc.AmountOfXp;
-import be.elgem.Jobs.Misc.EWayToXP;
+import be.elgem.Jobs.Misc.ExperienceValues;
+import be.elgem.Jobs.Misc.XpSteps;
+import be.elgem.Jobs.Misc.EXpMethod;
 import org.bukkit.Material;
 
 import java.util.HashMap;
@@ -28,7 +29,7 @@ public class Job {
      *          10: 10
      *          15: 1-5
      */
-    private HashMap<EWayToXP, HashMap<String, AmountOfXp>> xpSources;
+    private HashMap<EXpMethod, HashMap<String, XpSteps>> xpSources;
 
 //    private HashMap<Integer, ItemStack> reward; TODO système de récompense
 
@@ -45,18 +46,20 @@ public class Job {
 
         this.xpSources = new HashMap<>();
 
-        for(EWayToXP wayToXP : EWayToXP.values()){
+        for(EXpMethod wayToXP : EXpMethod.values()){
             xpSources.put(wayToXP, new HashMap<>());
         }
     }
 
-    public void addXpSource(EWayToXP wayToXP, String xpSource, AmountOfXp xpPerLevel){
+    public void addXpSource(EXpMethod wayToXP, String xpSource, XpSteps xpPerLevel){
         xpSources.get(wayToXP).put(xpSource, xpPerLevel);
 
-        JobEditor.addXpSource(jobUUID, wayToXP, xpSource, xpPerLevel);
+        if(xpPerLevel == null) {
+            JobEditor.addXpSource(jobUUID, wayToXP, xpSource);
+        }
     }
 
-    public int getXpFor( EWayToXP wayToXP, String experienceSource, int playerLevel) {
+    public int getXpFor(EXpMethod wayToXP, String experienceSource, int playerLevel) {
         if(xpSources.get(wayToXP).containsKey(experienceSource)){
             return xpSources.get(wayToXP).get(experienceSource).getAmountOfXp(playerLevel);
         }
@@ -119,7 +122,40 @@ public class Job {
         this.maxLevel = (short) newMaxLevel;
     }
 
-    public String[] getXpSources(EWayToXP wayToXP) {
+    public String[] getXpSources(EXpMethod wayToXP) {
         return xpSources.get(wayToXP).keySet().toArray(new String[0]);
+    }
+
+    public XpSteps getXpSteps(EXpMethod wayToXP, String xpSource) {
+        return xpSources.get(wayToXP).get(xpSource);
+    }
+
+    public void addXpStep(EXpMethod wayToXP, String xpSourceToEdit, int level, int xp) {
+        JobEditor.addXpStep(jobUUID, wayToXP, xpSourceToEdit, level, xp);
+
+        xpSources.get(wayToXP).get(xpSourceToEdit).addXpForLevel(level, xp);
+    }
+
+    public void addXpStep(EXpMethod wayToXP, String xpSourceToEdit, int level, int min, int max) {
+        JobEditor.addXpStep(jobUUID, wayToXP, xpSourceToEdit, level, min, max);
+
+        xpSources.get(wayToXP).get(xpSourceToEdit).addXpForLevel(level, min, max);
+    }
+
+    public void removeXpStep(EXpMethod wayToXP, String xpSourceToEdit, int parseInt) {
+        JobEditor.removeXpStep(jobUUID, wayToXP, xpSourceToEdit, parseInt);
+
+        xpSources.get(wayToXP).get(xpSourceToEdit).removeXpForLevel(parseInt);
+    }
+
+    public void modifyLevelOfXpStep(EXpMethod xpMethod, String xpSourceToEdit, int oldLevel, int newLevel) {
+        JobEditor.changeLevelOfStep(jobUUID, xpMethod, xpSourceToEdit, oldLevel, newLevel);
+        this.xpSources.get(xpMethod).get(xpSourceToEdit).modifyLevel(oldLevel, newLevel);
+    }
+
+    public void removeXpSource(EXpMethod xpMethod, String xpSourceToEdit) {
+        JobEditor.removeXpSource(jobUUID, xpMethod, xpSourceToEdit);
+
+        xpSources.get(xpMethod).remove(xpSourceToEdit);
     }
 }

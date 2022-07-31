@@ -28,7 +28,7 @@ public class ServerWideJobHandler {
         for (UUID playerUUID : serverWideJobsMap.keySet()) {
             for (PlayerJobData playerJobData : serverWideJobsMap.get(playerUUID).getPlayerJobData()) {
                 Level playerLevel = playerJobData.getLevel();
-                sqlInterface.updatePlayerLevel(playerLevel.getLevel(), playerLevel.getExperience(), playerUUID, playerJobData.getJob().getJobName());
+                sqlInterface.updatePlayerLevel(playerLevel.getLevel(), playerLevel.getExperience(), playerUUID, playerJobData.getJob().getJobUUID());
             }
         }
     }
@@ -41,22 +41,3 @@ public class ServerWideJobHandler {
         return serverWideJobsMap.get(playerUUID);
     }
 }
-
-
-
-
-
-
-
-
-
-//        for (UUID playerUUID : serverWideJobsMap.keySet()) {
-//            if(!sqlInterface.isPlayerInDatabase(playerUUID)){
-//                if(!firstPlayer)
-//                    playersToAdd += ",";
-//                else
-//                    firstPlayer = false;
-//
-//                playersToAdd += "("+sqlInterface.UUIDToBytes(playerUUID)+")";
-//            }
-//        }

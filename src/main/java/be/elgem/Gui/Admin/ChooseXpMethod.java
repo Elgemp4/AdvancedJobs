@@ -1,11 +1,8 @@
 package be.elgem.Gui.Admin;
 
 import be.elgem.Gui.Admin.XPEditor.BreakGUI;
-import be.elgem.Gui.Admin.XPEditor.XPEditorInsertGUI;
-import be.elgem.Gui.Admin.XPEditor.XpSourceEditor;
 import be.elgem.Gui.GUI;
 import be.elgem.Jobs.Jobs.Job;
-import be.elgem.Jobs.Misc.EWayToXP;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,10 +11,10 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
-public class WayToXpChooserGUI extends GUI {
+public class ChooseXpMethod extends GUI {
     Job jobToModify;
 
-    public WayToXpChooserGUI(Player player, Job jobToModify) {
+    public ChooseXpMethod(Player player, Job jobToModify) {
         super(player, 54, ChatColor.RED + "Choisissez l'action à modifier");
 
         this.jobToModify = jobToModify;
@@ -54,7 +51,7 @@ public class WayToXpChooserGUI extends GUI {
         meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
         arrow.setItemMeta(meta);
 
-        addItem(45, arrow, () -> new ModificationTypeSelector(player, jobToModify).openInventory());
+        addItem(45, arrow, () -> new ChooseModificationGUI(player, jobToModify).openInventory());
     }
 
     @Override

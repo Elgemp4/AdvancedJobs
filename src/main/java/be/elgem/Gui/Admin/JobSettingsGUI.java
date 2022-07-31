@@ -12,10 +12,10 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionType;
 
-public class JobSettingsModifierGUI extends GUI {
+public class JobSettingsGUI extends GUI {
     Job jobToModify;
 
-    public JobSettingsModifierGUI(Player player, Job jobToModify) {
+    public JobSettingsGUI(Player player, Job jobToModify) {
         super(player, 27, ChatColor.RED + "Paramètres de " + jobToModify.getJobName());
 
         this.jobToModify = jobToModify;
@@ -25,13 +25,7 @@ public class JobSettingsModifierGUI extends GUI {
 
     @Override
     protected void createInventory() {
-        ItemStack blackGlassPane = createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE);;
-
-        for (int row = 0; row <= 2; row+=2) {
-            for (int col = 0; col < 9; col++) {
-                addItem(row*9 + col, blackGlassPane, null);
-            }
-        }
+        surroundWith(createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE));
 
         addItem(9, createItemStack("Changer l'icône du métier", jobToModify.getIcon()), () -> startWaitingForItemSelection("Cliquez sur l'objet que vous voulez définir comme icône", "icon"));
         addItem(10, createItemStack("Changer le nom du métier", Material.NAME_TAG), () -> startWaitingForInput( "Entrez le nouveau nom du métier : ", "name"));
@@ -45,7 +39,7 @@ public class JobSettingsModifierGUI extends GUI {
         meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
         arrow.setItemMeta(meta);
 
-        addItem(18, arrow, () -> new ModificationTypeSelector(player, jobToModify).openInventory());
+        addItem(18, arrow, () -> new ChooseModificationGUI(player, jobToModify).openInventory());
     }
 
 
@@ -112,7 +106,7 @@ public class JobSettingsModifierGUI extends GUI {
         }
 
         if(!ignoreInterfaceReset) {
-            new JobSettingsModifierGUI(player, jobToModify).openInventory();
+            new JobSettingsGUI(player, jobToModify).openInventory();
         }
     }
 }

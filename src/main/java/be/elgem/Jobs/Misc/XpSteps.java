@@ -2,10 +2,10 @@ package be.elgem.Jobs.Misc;
 
 import java.util.TreeMap;
 
-public class AmountOfXp {
+public class XpSteps {
     private TreeMap<Integer, ExperienceValues> amountOfXpPerLevel;
 
-    public AmountOfXp(){
+    public XpSteps(){
         amountOfXpPerLevel = new TreeMap<>();
     }
 
@@ -14,7 +14,16 @@ public class AmountOfXp {
     }
 
     public void addXpForLevel(int requiredLevel, int minXp, int maxXp) {
+        if(amountOfXpPerLevel.containsKey(requiredLevel)) {
+            amountOfXpPerLevel.remove(requiredLevel);
+        }
         amountOfXpPerLevel.put(requiredLevel, new ExperienceValues(maxXp, minXp));
+    }
+
+    public void removeXpForLevel(int level) {
+        if(amountOfXpPerLevel.containsKey(level)) {
+            amountOfXpPerLevel.remove(level);
+        }
     }
 
     public int getAmountOfXp(int level) {
@@ -38,4 +47,11 @@ public class AmountOfXp {
     public TreeMap<Integer, ExperienceValues> getAmountOfXpPerLevel() {
         return amountOfXpPerLevel;
     }
+
+    public void modifyLevel(int oldLevel, int newLevel) {
+        amountOfXpPerLevel.put(newLevel, amountOfXpPerLevel.get(oldLevel));
+        amountOfXpPerLevel.remove(oldLevel);
+    }
+
+
 }

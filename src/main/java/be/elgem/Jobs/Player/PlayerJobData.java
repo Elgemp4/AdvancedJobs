@@ -1,7 +1,7 @@
 package be.elgem.Jobs.Player;
 
 import be.elgem.Jobs.Display.Display;
-import be.elgem.Jobs.Misc.EWayToXP;
+import be.elgem.Jobs.Misc.EXpMethod;
 import be.elgem.Jobs.Jobs.Job;
 import be.elgem.Jobs.Misc.Level;
 import be.elgem.Main;
@@ -24,7 +24,7 @@ public class PlayerJobData {
         this.infoDisplay = Main.getMain().getJobsInfoDisplay();
     }
 
-    public void tryAddXP(EWayToXP wayToXP, String xpSource) {
+    public void tryAddXP(EXpMethod wayToXP, String xpSource) {
         int experienceToAdd = job.getXpFor(wayToXP, xpSource, level.getLevel());
 
         if(experienceToAdd == 0 ){

@@ -1,16 +1,24 @@
 package be.elgem.Gui;
 
 import be.elgem.Main;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.material.Skull;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -49,14 +57,26 @@ public abstract class GUI {
         return itemStack;
     }
 
-    public ItemStack createSkull(String name, String uuid) {
-        ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta itemMeta = (SkullMeta) itemStack.getItemMeta();
-        itemMeta.setDisplayName(ChatColor.RESET + "" + ChatColor.WHITE + name);
-        itemMeta.setOwningPlayer(Bukkit.getOfflinePlayer(UUID.fromString(uuid)));
-        itemStack.setItemMeta(itemMeta);
+    public ItemStack createSkull(String name, String value) {
 
-        return itemStack;
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+
+        SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
+        skullMeta.setDisplayName(ChatColor.RESET + "" + ChatColor.WHITE + name);
+        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+
+        profile.getProperties().put("textures", new Property("textures", value));
+
+        try {
+            Method mtd = skullMeta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
+            mtd.setAccessible(true);
+            mtd.invoke(skullMeta, profile);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ex) {
+            ex.printStackTrace();
+        }
+
+        head.setItemMeta(skullMeta);
+        return head;
     }
 
     public void addItem(int slot, ItemStack itemStack, Runnable actionOnClick){
@@ -78,6 +98,16 @@ public abstract class GUI {
         createInventory();
         Main.getMain().getOpenedGUI().addGUI(player, this);
         player.openInventory(menu);
+    }
+
+    protected void surroundWith(ItemStack surroundItem) {
+        for (int i = 0; i < 9; i++) {
+            addItem(i, surroundItem, null);
+        }
+
+        for (int i = menu.getSize() - 9; i < menu.getSize(); i++) {
+            addItem(i, surroundItem, null);
+        }
     }
 
     protected void clearActions() {
@@ -131,15 +161,15 @@ public abstract class GUI {
     protected abstract void createInventory();
 
     public void getInput(String input) {
+        isWaitingForInput = false;
         this.openInventory();
         computeInput(input);
-        isWaitingForInput = false;
     }
 
     public void getItemSelection(ItemStack itemStack) {
+        isWaitingForItemSelection = false;
         this.openInventory();
         computeSelectedItem(itemStack);
-        isWaitingForItemSelection = false;
     }
 
     protected abstract void computeSelectedItem(ItemStack item);

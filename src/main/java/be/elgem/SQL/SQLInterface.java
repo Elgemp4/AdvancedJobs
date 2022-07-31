@@ -1,6 +1,5 @@
 package be.elgem.SQL;
 
-import be.elgem.Jobs.Jobs.Job;
 import be.elgem.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -54,29 +53,29 @@ public class SQLInterface {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () -> {
             connectToDatabase();
 
-            try {
-                Statement playerStatement = connection.createStatement();
-                String playersTableRequest =    "CREATE TABLE IF NOT EXISTS players(" +
-                                                "player_id MEDIUMINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT, " +
-                                                "player_uuid BINARY(16) NOT NULL UNIQUE);";
-
-                playerStatement.execute(playersTableRequest);
-
-                playerStatement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println("Failed to create player table");
-            }
+//            try {
+//                Statement playerStatement = connection.createStatement();
+//                String playersTableRequest =    "CREATE TABLE IF NOT EXISTS players(" +
+//                                                "player_id MEDIUMINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT, " +
+//                                                "player_uuid BINARY(16) NOT NULL UNIQUE);";
+//
+//                playerStatement.execute(playersTableRequest);
+//
+//                playerStatement.close();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//                System.out.println("Failed to create player table");
+//            }
 
             try {
                 Statement jobsStatement = connection.createStatement();
                 String jobsTableRequest =       "CREATE TABLE IF NOT EXISTS players_jobs(" +
                                                 "job_id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT," +
                                                 "player_uuid Binary(16) NOT NULL," +
-                                                "job_name VARCHAR(20) NOT NULL, " +
+                                                "job_uuid Binary(16) NOT NULL, " +
                                                 "job_level SMALLINT NOT NULL," +
                                                 "job_experience INT NOT NULL," +
-                                                "UNIQUE KEY uidx_job (job_name, player_uuid))" +
+                                                "UNIQUE KEY uidx_job (job_uuid, player_uuid))" +
                                                 "ENGINE=INNODB;";
 
                 jobsStatement.execute(jobsTableRequest);
@@ -96,7 +95,7 @@ public class SQLInterface {
         });
     }
 
-    public void loadJobsData(String job, UUID playerUUID, SQLCallback callback) {
+    public void loadJobsData(UUID jobUUID, UUID playerUUID, SQLCallback callback) {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () -> {
             connectToDatabase();
 
@@ -105,10 +104,10 @@ public class SQLInterface {
             try {
                 jobStatement = connection.prepareStatement( "SELECT job_level AS level, job_experience AS xp " +
                                                                 "FROM players_jobs " +
-                                                                "WHERE player_uuid = UNHEX(?) AND job_name = ?;");
+                                                                "WHERE player_uuid = UNHEX(?) AND job_uuid = UNHEX(?);");
 
                 jobStatement.setString(1, UUIDToBytes(playerUUID));
-                jobStatement.setString(2, job);
+                jobStatement.setString(2, UUIDToBytes(jobUUID));
 
                 ResultSet resultSet = jobStatement.executeQuery();
 
@@ -119,13 +118,14 @@ public class SQLInterface {
 
             } catch (SQLException e) {
                 e.printStackTrace();
+                System.out.println("Failed to load job data");
             } finally {
                 try {if(jobStatement != null) jobStatement.close();}catch (Exception e){}
             }
         });
     }
 
-    public void updatePlayerLevel(Short level, int experience, UUID playerUUID, String job) {
+    public void updatePlayerLevel(Short level, int experience, UUID playerUUID, UUID jobUUID) {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () ->{
             connectToDatabase();
 
@@ -133,17 +133,18 @@ public class SQLInterface {
             try{
                 updateStatement = connection.prepareStatement(  "UPDATE players_jobs " +
                                                                     "SET job_level = ?, job_experience = ? " +
-                                                                    "WHERE player_uuid = UNHEX(?) AND job_name = ?;");
+                                                                    "WHERE player_uuid = UNHEX(?) AND job_uuid = UNHEX(?);");
 
                 updateStatement.setShort(1, level);
                 updateStatement.setInt(2, experience);
                 updateStatement.setString(3, UUIDToBytes(playerUUID));
-                updateStatement.setString(4, job);
+                updateStatement.setString(4, UUIDToBytes(jobUUID));
 
                 updateStatement.executeUpdate();
             }
             catch (SQLException e) {
                 e.printStackTrace();
+                System.out.println("Failed to update player level");
             }
             finally {
                 try {if(updateStatement!=null) updateStatement.close();} catch(Exception e){}
@@ -151,16 +152,16 @@ public class SQLInterface {
         });
     }
 
-    public void doesPlayerJobExists(UUID playerUUID, String job_name, SQLCallback sqlCallback){
+    public void doesPlayerJobExists(UUID playerUUID, UUID jobUUID, SQLCallback sqlCallback){
         Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () ->{
             connectToDatabase();
 
             PreparedStatement existStatement = null;
             try{
-                existStatement = connection.prepareStatement(" SELECT EXISTS( SELECT * FROM players_jobs WHERE(player_uuid = UNHEX(?) AND job_name = ?)) AS exist;");
+                existStatement = connection.prepareStatement("SELECT EXISTS( SELECT * FROM players_jobs WHERE(player_uuid = UNHEX(?) AND job_uuid = UNHEX(?))) AS exist;");
 
                 existStatement.setString(1, UUIDToBytes(playerUUID));
-                existStatement.setString(2, job_name);
+                existStatement.setString(2, UUIDToBytes(jobUUID));
 
                 ResultSet resultSet = existStatement.executeQuery();
 
@@ -173,6 +174,7 @@ public class SQLInterface {
             }
             catch (SQLException e) {
                 e.printStackTrace();
+                System.out.println("Failed to find out if player job exists");
             }
             finally {
                 try {if(existStatement!=null) existStatement.close();} catch(Exception e){}
@@ -180,22 +182,23 @@ public class SQLInterface {
         });
     }
 
-    public void insertPlayerJob(UUID playerUUID, String job_name) {
+    public void insertPlayerJob(UUID playerUUID, UUID jobUUID) {
         Bukkit.getScheduler().runTaskAsynchronously(Main.getMain(), () ->{
             connectToDatabase();
 
             PreparedStatement insertStatement = null;
             try{
-                insertStatement = connection.prepareStatement(  "INSERT INTO players_jobs (player_uuid, job_name, job_level, job_experience) " +
-                                                                    "VALUES (UNHEX(?), ?, 1, 0);");
+                insertStatement = connection.prepareStatement(  "INSERT INTO players_jobs (player_uuid, job_uuid, job_level, job_experience) " +
+                                                                    "VALUES(UNHEX(?), UNHEX(?), 1, 0);");
 
                 insertStatement.setString(1, UUIDToBytes(playerUUID));
-                insertStatement.setString(2, job_name);
+                insertStatement.setString(2, UUIDToBytes(jobUUID));
 
                 insertStatement.executeUpdate();
             }
             catch (SQLException e) {
                 e.printStackTrace();
+                System.out.println("Failed to insert player job");
             }
             finally {
                 try {if(insertStatement!=null) insertStatement.close();} catch(Exception e){}
@@ -207,9 +210,6 @@ public class SQLInterface {
 
     public String UUIDToBytes(UUID playerUUID) {
         String stringUUID = playerUUID.toString().replaceAll("-","");
-
-//        System.out.println(playerUUID);
-//        System.out.println(stringUUID);
 
         return stringUUID;
     }

@@ -1,6 +1,6 @@
 package be.elgem;
 
-import be.elgem.Gui.Admin.EditJobChooserGUI;
+import be.elgem.Gui.Admin.ChooseJobToEditGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,7 +20,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
         switch (args[0]){
             case "edit":
-                new EditJobChooserGUI(player).openInventory();
+                new ChooseJobToEditGUI(player).openInventory();
                 break;
             default:
                 player.sendMessage(ChatColor.RED + "Incorrect usage : /jobs <arg>");

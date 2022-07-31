@@ -12,11 +12,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class EditJobChooserGUI extends GUI {
+public class ChooseJobToEditGUI extends GUI {
     private int numberOfPages = 1;
     private int currentPage = 0;
 
-    public EditJobChooserGUI(Player player) {
+    public ChooseJobToEditGUI(Player player) {
         super(player, 27, ChatColor.RED + "Choisissez le métier à modifier");
 
         createInventory();
@@ -27,13 +27,7 @@ public class EditJobChooserGUI extends GUI {
         this.menu.clear();
         this.clearActions();
 
-        ItemStack blackGlassPane = createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE);;
-
-        for (int row = 0; row <= 2; row+=2) {
-            for (int col = 0; col < 9; col++) {
-                addItem(row*9 + col, blackGlassPane, null);
-            }
-        }
+        surroundWith(new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
 
         ArrayList<Job> jobs = Main.getMain().getJobsLoader().getJobsArray();
 
@@ -47,7 +41,7 @@ public class EditJobChooserGUI extends GUI {
 
             int index = 9 + (i % 9);
 
-            addItem(index, createItemStack(job.getJobName(), job.getIcon()), () -> new ModificationTypeSelector(player, job).openInventory());
+            addItem(index, createItemStack(job.getJobName(), job.getIcon()), () -> new ChooseModificationGUI(player, job).openInventory());
         }
 
         if(lastDisplayedJob == jobs.size()) {

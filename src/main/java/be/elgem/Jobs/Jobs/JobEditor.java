@@ -1,13 +1,12 @@
 package be.elgem.Jobs.Jobs;
 
 import be.elgem.Configuration.CustomConfigurationInterface;
-import be.elgem.Jobs.Misc.AmountOfXp;
-import be.elgem.Jobs.Misc.EWayToXP;
+import be.elgem.Jobs.Misc.XpSteps;
+import be.elgem.Jobs.Misc.EXpMethod;
 import be.elgem.Jobs.Misc.ExperienceValues;
 import be.elgem.Main;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.TreeMap;
 import java.util.UUID;
@@ -81,27 +80,58 @@ public class JobEditor {
         customConfigurationInterface.saveConfiguration();
     }
 
-    public static void addXpSource(UUID jobUUID, EWayToXP wayToXp, String experienceSource, AmountOfXp amountOfXp) {
+    public static void changeLevelOfStep(UUID jobUUID, EXpMethod xpMethod, String experienceSource, int previousLevel, int newLevel) {
+        CustomConfigurationInterface customConfigurationInterface = Main.getMain().getJobsConfig();
+        ConfigurationSection xpSourceSection = customConfigurationInterface.getCustomConfigFile().getConfigurationSection(jobUUID.toString() + ".experience_sources." + xpMethod.toString() + "." + experienceSource);
+        xpSourceSection.set(""+newLevel, xpSourceSection.get(""+previousLevel));
+        xpSourceSection.set(""+previousLevel, null);
+        customConfigurationInterface.saveConfiguration();
+    }
+
+    public static void addXpSource(UUID jobUUID, EXpMethod xpMethod, String experienceSource) {
         CustomConfigurationInterface customConfigurationInterface = Main.getMain().getJobsConfig();
         ConfigurationSection jobConfig = customConfigurationInterface.getCustomConfigFile().getConfigurationSection(jobUUID.toString() + ".experience_sources");
 
-        jobConfig.createSection(wayToXp.toString() + "." + experienceSource);
+        jobConfig.createSection(xpMethod.toString() + "." + experienceSource);
 
-        if(amountOfXp != null) {
-            TreeMap<Integer, ExperienceValues> xpValues = amountOfXp.getAmountOfXpPerLevel();
+        customConfigurationInterface.saveConfiguration();
+    }
 
-            for (int level : xpValues.keySet()) {
-                ExperienceValues values = xpValues.get(level);
-                if(values.isSingleValue()){
-                    jobConfig.set(wayToXp + "." + experienceSource + "." + level, values.getMin());
-                }
-                else{
-                    jobConfig.set(wayToXp + "." + experienceSource + "." + level, values.getMin() + " / " + values.getMax());
-                }
-            }
-        }
+    public static void addXpStep(UUID jobUUID, EXpMethod xpMethod, String xpSourceToEdit, int level, int min, int max) {
+        CustomConfigurationInterface customConfigurationInterface = Main.getMain().getJobsConfig();
+        ConfigurationSection jobConfig = customConfigurationInterface.getCustomConfigFile().getConfigurationSection(jobUUID.toString() + ".experience_sources");
+        ConfigurationSection xpSource = jobConfig.getConfigurationSection(xpMethod.toString() + "." + xpSourceToEdit);
 
+        xpSource.set(""+level, min + " / " + max);
 
+        customConfigurationInterface.saveConfiguration();
+    }
+
+    public static void addXpStep(UUID jobUUID, EXpMethod xpMethod, String xpSourceToEdit, int level, int xp) {
+        CustomConfigurationInterface customConfigurationInterface = Main.getMain().getJobsConfig();
+        ConfigurationSection jobConfig = customConfigurationInterface.getCustomConfigFile().getConfigurationSection(jobUUID.toString() + ".experience_sources");
+        ConfigurationSection xpSource = jobConfig.getConfigurationSection(xpMethod.toString() + "." + xpSourceToEdit);
+
+        xpSource.set(""+level, xp);
+
+        customConfigurationInterface.saveConfiguration();
+    }
+
+    public static void removeXpStep(UUID jobUUID, EXpMethod xpMethod, String xpSourceToEdit, int level) {
+        CustomConfigurationInterface customConfigurationInterface = Main.getMain().getJobsConfig();
+        ConfigurationSection jobConfig = customConfigurationInterface.getCustomConfigFile().getConfigurationSection(jobUUID.toString() + ".experience_sources");
+        ConfigurationSection xpSource = jobConfig.getConfigurationSection(xpMethod.toString() + "." + xpSourceToEdit);
+
+        xpSource.set(""+level, null);
+
+        customConfigurationInterface.saveConfiguration();
+    }
+
+    public static void removeXpSource(UUID jobUUID, EXpMethod xpMethod, String xpSourceToEdit) {
+        CustomConfigurationInterface customConfigurationInterface = Main.getMain().getJobsConfig();
+        ConfigurationSection jobConfig = customConfigurationInterface.getCustomConfigFile().getConfigurationSection(jobUUID.toString() + ".experience_sources." + xpMethod.toString());
+        jobConfig.set(xpSourceToEdit, null);
+        System.out.println("ici");
         customConfigurationInterface.saveConfiguration();
     }
 }

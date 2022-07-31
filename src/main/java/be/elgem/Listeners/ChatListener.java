@@ -1,6 +1,5 @@
 package be.elgem.Listeners;
 
-import be.elgem.Gui.Admin.JobSettingsModifierGUI;
 import be.elgem.Gui.GUI;
 import be.elgem.Main;
 import org.bukkit.Bukkit;

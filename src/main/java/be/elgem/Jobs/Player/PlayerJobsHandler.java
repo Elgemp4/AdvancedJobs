@@ -1,10 +1,9 @@
 package be.elgem.Jobs.Player;
 
 import be.elgem.Jobs.Jobs.Job;
-import be.elgem.Jobs.Misc.EWayToXP;
+import be.elgem.Jobs.Misc.EXpMethod;
 import be.elgem.Jobs.Misc.Level;
 import be.elgem.Main;
-import be.elgem.SQL.SQLCallback;
 import be.elgem.SQL.SQLInterface;
 import org.bukkit.entity.Player;
 
@@ -23,14 +22,12 @@ public class PlayerJobsHandler {
         SQLInterface sqlInterface = Main.getMain().getSQLInterface();
 
         for(Job job : Main.getMain().getJobsLoader().getJobsArray()){
-            sqlInterface.doesPlayerJobExists(playerUUID, job.getJobName(), (level, experience) -> {
+            sqlInterface.doesPlayerJobExists(playerUUID, job.getJobUUID(), (level, experience) -> {
                 if(level == -1) {
-                    sqlInterface.insertPlayerJob(playerUUID, job.getJobName());
+                    sqlInterface.insertPlayerJob(playerUUID, job.getJobUUID());
                 }
             });
-            sqlInterface.loadJobsData(job.getJobName(), playerUUID, (level, experience) -> {
-                playerJobData.add(new PlayerJobData(job, new Level(level, job.getMaxLevel(), experience, job.getFirstLevelExperience(), job.getExperienceGrowth(), player), player));
-            });
+            sqlInterface.loadJobsData(job.getJobUUID(), playerUUID, (level, experience) -> playerJobData.add(new PlayerJobData(job, new Level(level, job.getMaxLevel(), experience, job.getFirstLevelExperience(), job.getExperienceGrowth(), player), player)));
         }
     }
 
@@ -38,9 +35,9 @@ public class PlayerJobsHandler {
         return playerJobData;
     }
 
-    public void addXpToJob(EWayToXP eWayToXP, String xpSource){
+    public void addXpToJob(EXpMethod xpMethod, String xpSource){
         playerJobData.forEach((job) ->{
-            job.tryAddXP(eWayToXP, xpSource);
+            job.tryAddXP(xpMethod, xpSource);
         });
     }
 }

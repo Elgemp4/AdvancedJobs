@@ -1,5 +1,5 @@
 package be.elgem.Jobs.Misc;
 
-public enum EWayToXP {
+public enum EXpMethod {
     BREAK, PLACE, KILL, TAME, FISH
 }

@@ -1,17 +1,15 @@
 package be.elgem.Listeners;
 
-import be.elgem.Jobs.Misc.EWayToXP;
+import be.elgem.Jobs.Misc.EXpMethod;
 import be.elgem.Jobs.Player.ServerWideJobHandler;
 import be.elgem.Main;
 import be.elgem.PlayerBlockTracker.ChunkPersistentData;
-import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class BlockBreakListener implements Listener {
     private ServerWideJobHandler serverWideJobHandler;
@@ -38,10 +36,11 @@ public class BlockBreakListener implements Listener {
             return;
         }
 
-        String brokenBlockString = brokenBlock.getBlockData().getMaterial().getKey().toString();
+
+        String brokenBlockString = brokenBlock.getBlockData().getMaterial().toString();
         Player player = event.getPlayer();
 
-        serverWideJobHandler.getPlayerJobsHandler(player.getUniqueId()).addXpToJob(EWayToXP.BREAK, brokenBlockString);
+        serverWideJobHandler.getPlayerJobsHandler(player.getUniqueId()).addXpToJob(EXpMethod.BREAK, brokenBlockString);
     }
 
     @EventHandler
@@ -57,9 +56,9 @@ public class BlockBreakListener implements Listener {
 
         chunkPersistentData.addPlayerBlock(placedBlock);
 
-        String placeBlockString = event.getBlock().getBlockData().getMaterial().getKey().toString();
+        String placeBlockString = event.getBlock().getBlockData().getMaterial().toString();
 
-        serverWideJobHandler.getPlayerJobsHandler(player.getUniqueId()).addXpToJob(EWayToXP.PLACE, placeBlockString);
+        serverWideJobHandler.getPlayerJobsHandler(player.getUniqueId()).addXpToJob(EXpMethod.PLACE, placeBlockString);
     }
 
 }
