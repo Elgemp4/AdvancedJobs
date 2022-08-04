@@ -18,7 +18,7 @@ import java.util.logging.Level;
 public class JobsLoader {
     private ArrayList<Job> jobsArray;
 
-    private Configuration pluginConfig;
+    final private Configuration pluginConfig;
 
     public JobsLoader() {
         this.pluginConfig = Main.getMain().getJobsConfig().getCustomConfigFile();
@@ -31,6 +31,12 @@ public class JobsLoader {
 
         for (String uuid : pluginConfig.getKeys(false)) {
             ConfigurationSection jobSection = pluginConfig.getConfigurationSection(uuid);
+
+
+            if(jobSection == null) {
+                System.out.println("Error while loading job.yml, please do not modify it manually !!!");
+                continue;
+            }
 
             String jobName = jobSection.getString("name");
             short maxLevel = (short) jobSection.getInt("max_level");

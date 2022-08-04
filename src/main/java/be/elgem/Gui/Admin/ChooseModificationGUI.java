@@ -6,34 +6,24 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
 public class ChooseModificationGUI extends GUI {
-    private Job jobToModify;
+    final private Job jobToModify;
 
-    public ChooseModificationGUI(Player player, Job job) {
-        super(player, 27, ChatColor.RED + "Choisissez le type de modification");
+    public ChooseModificationGUI(Player player, Job job, GUI previousGUI) {
+        super(player, 27,  previousGUI);
 
         this.jobToModify = job;
-
-        createInventory();
     }
 
     @Override
-    protected void createInventory() {
+    protected void createGUI() {
         surroundWith(createItemStack(" ", Material.BLACK_STAINED_GLASS_PANE));
 
-        addItem(12, createItemStack("Paramètres", Material.REDSTONE), () -> new JobSettingsGUI(player, jobToModify).openInventory());
-        addItem(14, createItemStack("Changer les moyens de gagner de l'expérience", Material.EXPERIENCE_BOTTLE), () -> new ChooseXpMethod(player, jobToModify).openInventory());
+        addItem(12, createItemStack("Paramètres", Material.REDSTONE), () -> new JobSettingsGUI(player, jobToModify, this).openInventory());
+        addItem(14, createItemStack("Changer les moyens de gagner de l'expérience", Material.EXPERIENCE_BOTTLE), () -> new ChooseXpMethod(player, jobToModify, this).openInventory());
 
-        ItemStack arrow = createItemStack("Retour", Material.TIPPED_ARROW);
-        PotionMeta meta = (PotionMeta) arrow.getItemMeta();
-        meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
-        arrow.setItemMeta(meta);
-
-        addItem(18, arrow, () -> new ChooseJobToEditGUI(player).openInventory());
+        addBackButton();
     }
 
     @Override
@@ -44,5 +34,10 @@ public class ChooseModificationGUI extends GUI {
     @Override
     public void computeInput(String input) {
 
+    }
+
+    @Override
+    protected String getTitle() {
+        return ChatColor.RED + "Choisissez le type de modification";
     }
 }

@@ -13,17 +13,14 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class ChooseJobToEditGUI extends GUI {
-    private int numberOfPages = 1;
     private int currentPage = 0;
 
     public ChooseJobToEditGUI(Player player) {
-        super(player, 27, ChatColor.RED + "Choisissez le métier à modifier");
-
-        createInventory();
+        super(player, 27, null);
     }
 
     @Override
-    protected void createInventory() {
+    protected void createGUI() {
         this.menu.clear();
         this.clearActions();
 
@@ -31,7 +28,7 @@ public class ChooseJobToEditGUI extends GUI {
 
         ArrayList<Job> jobs = Main.getMain().getJobsLoader().getJobsArray();
 
-        numberOfPages = (int) Math.ceil((jobs.size() + 1) / 9.0); //+1 is for the job create button
+        int numberOfPages = (int) Math.ceil((jobs.size() + 1) / 9.0); //+1 is for the job create button
 
         int firstDisplayedJob = currentPage * 9;
         int lastDisplayedJob = Math.min(firstDisplayedJob + 9, jobs.size());
@@ -41,7 +38,7 @@ public class ChooseJobToEditGUI extends GUI {
 
             int index = 9 + (i % 9);
 
-            addItem(index, createItemStack(job.getJobName(), job.getIcon()), () -> new ChooseModificationGUI(player, job).openInventory());
+            addItem(index, createItemStack(job.getJobName(), job.getIcon()), () -> new ChooseModificationGUI(player, job, this).openInventory());
         }
 
         if(lastDisplayedJob == jobs.size()) {
@@ -77,17 +74,17 @@ public class ChooseJobToEditGUI extends GUI {
 
         Main.getMain().getJobsLoader().loadJobs();
 
-        this.createInventory();
+        this.createGUI();
     }
 
     private void nextPage() {
         currentPage++;
-        createInventory();
+        createGUI();
     }
 
     private void previousPage() {
         currentPage--;
-        createInventory();
+        createGUI();
     }
 
     @Override
@@ -98,5 +95,10 @@ public class ChooseJobToEditGUI extends GUI {
     @Override
     public void computeInput(String input) {
 
+    }
+
+    @Override
+    protected String getTitle() {
+        return ChatColor.RED + "Choisissez le métier à modifier";
     }
 }

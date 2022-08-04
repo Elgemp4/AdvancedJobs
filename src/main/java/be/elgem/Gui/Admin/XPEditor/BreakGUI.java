@@ -1,5 +1,6 @@
 package be.elgem.Gui.Admin.XPEditor;
 
+import be.elgem.Gui.GUI;
 import be.elgem.Jobs.Jobs.Job;
 import be.elgem.Jobs.Misc.EXpMethod;
 import org.bukkit.Material;
@@ -9,15 +10,17 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 
 public class BreakGUI extends XPEditorInsertGUI{
-    public BreakGUI(Player player, Job editedJob) {
-        super(player, EXpMethod.BREAK, editedJob);
+    public BreakGUI(Player player, Job editedJob, GUI previousGUI) {
+        super(player, EXpMethod.BREAK, editedJob, previousGUI);
     }
 
     @Override
-    protected boolean isAValidXpSource(Object xpSource) {
-        if(!(xpSource instanceof ItemStack)) {return false;}
-        ItemStack item = (ItemStack) xpSource;
-        return item.getType().isBlock();
+    protected String getXpSourceFromItemStack(ItemStack itemStack) {
+        if(itemStack.getType().isBlock()) {
+            return itemStack.getType().toString();
+        }else{
+            return null;
+        }
     }
 
     @Override

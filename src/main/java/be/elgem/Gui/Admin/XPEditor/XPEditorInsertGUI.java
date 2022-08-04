@@ -1,6 +1,5 @@
 package be.elgem.Gui.Admin.XPEditor;
 
-import be.elgem.Gui.Admin.ChooseXpMethod;
 import be.elgem.Gui.GUI;
 import be.elgem.Jobs.Jobs.Job;
 import be.elgem.Jobs.Misc.EXpMethod;
@@ -18,27 +17,21 @@ public abstract class XPEditorInsertGUI extends GUI {
 
     protected Job jobToModify;
 
-    public XPEditorInsertGUI(Player player, EXpMethod wayToXP, Job editedJob) {
-        super(player, 54, "Editeur de l'action " + wayToXP.toString());
+    public XPEditorInsertGUI(Player player, EXpMethod xpMethod, Job editedJob, GUI previousGUI) {
+        super(player, 54, previousGUI);
 
-        this.xpMethod = wayToXP;
+        this.xpMethod = xpMethod;
 
         this.jobToModify = editedJob;
-
-        createInventory();
     }
 
     @Override
-    protected void createInventory() {
+    protected void createGUI() {
         surroundWith(new ItemStack(Material.GREEN_STAINED_GLASS_PANE));
 
         addItem(4, createItemStack("Ajouter moyen d'xp", Material.HOPPER), () -> startWaitingForItemSelection("[Jobs] Faites un clique droit avec l'object que vous voulez ajouter : ", "newXpSource"));
 
-        addItem(45, createItemStack("Retour", Material.TIPPED_ARROW), () -> new ChooseXpMethod(player, jobToModify).openInventory());
-
         HashMap<ItemStack, String> xpSource = loadXpSources();
-
-
 
         Object[] items = xpSource.keySet().toArray();
 
@@ -50,26 +43,29 @@ public abstract class XPEditorInsertGUI extends GUI {
             meta.setLore(XpSourceEditor.createXpSourceLore(jobToModify, xpMethod, xpSourceString));
             itemStack.setItemMeta(meta);
 
-            addItem(i + 9, itemStack, () -> new XpSourceEditor(player, xpMethod, xpSourceString, jobToModify).openInventory());
+            addItem(i + 9, itemStack, () -> new XpSourceEditor(player, xpMethod, xpSourceString, jobToModify, this).openInventory());
         }
+
+        addBackButton();
     }
 
-    protected abstract boolean isAValidXpSource(Object xpSource);
+    protected abstract String getXpSourceFromItemStack(ItemStack itemStack);
 
     protected abstract HashMap<ItemStack, String> loadXpSources();
 
+    @Override
+    protected String getTitle() {
+        return "Editeur de l'action " + xpMethod.toString();
+    }
 
     @Override
     public void computeSelectedItem(ItemStack item) {
-        switch (itemSelectionDestination) {
-            case "newXpSource":
-                if (isAValidXpSource(item)) {
-                    jobToModify.addXpSource(xpMethod, item.getType().toString(), null);
-                    openInventory();
-                } else {
-                    player.sendMessage("[Jobs] Ce n'est pas un moyen d'xp valide.");
-                }
-                break;
+        String xpSource = getXpSourceFromItemStack(item);
+        if (xpSource != null) {
+            jobToModify.addXpSource(xpMethod, xpSource, null);
+            resetAndOpenInventory();
+        } else {
+            player.sendMessage("[Jobs] Ce n'est pas un moyen d'xp valide.");
         }
     }
 

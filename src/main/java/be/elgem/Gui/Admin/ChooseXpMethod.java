@@ -1,36 +1,32 @@
 package be.elgem.Gui.Admin;
 
 import be.elgem.Gui.Admin.XPEditor.BreakGUI;
+import be.elgem.Gui.Admin.XPEditor.KillGUI;
 import be.elgem.Gui.GUI;
 import be.elgem.Jobs.Jobs.Job;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionType;
 
 public class ChooseXpMethod extends GUI {
     Job jobToModify;
 
-    public ChooseXpMethod(Player player, Job jobToModify) {
-        super(player, 54, ChatColor.RED + "Choisissez l'action à modifier");
+    public ChooseXpMethod(Player player, Job jobToModify, GUI previousGUI) {
+        super(player, 54, previousGUI);
 
         this.jobToModify = jobToModify;
-
-        createInventory();
     }
 
     @Override
-    protected void createInventory() {
-        ItemStack greenGlassPane = createItemStack(" ", Material.GREEN_STAINED_GLASS_PANE);;
+    protected void createGUI() {
+        ItemStack greenGlassPane = createItemStack(" ", Material.GREEN_STAINED_GLASS_PANE);
         for (int i = 0; i < 54; i++) {
             addItem(i, greenGlassPane, null);
         }
 
-        addItem(11, createItemStack("Casser", Material.NETHERITE_PICKAXE), () -> new BreakGUI(player, jobToModify).openInventory());
-        addItem(12, createItemStack("Tuer", Material.NETHERITE_SWORD), null);
+        addItem(11, createItemStack("Casser", Material.NETHERITE_PICKAXE), () -> new BreakGUI(player, jobToModify, this).openInventory());
+        addItem(12, createItemStack("Tuer", Material.NETHERITE_SWORD), () -> new KillGUI(player, jobToModify, this).openInventory());
         addItem(13, createItemStack("Pêcher", Material.FISHING_ROD), null);
         addItem(14, createItemStack("Tondre", Material.SHEARS), null);
         addItem(15, createItemStack("Récupérer du lait", Material.MILK_BUCKET), null);
@@ -46,12 +42,7 @@ public class ChooseXpMethod extends GUI {
         addItem(50, createItemStack("Échanger avec des villageois", Material.EMERALD), null);
         addItem(51, createItemStack("Collecter", Material.HONEYCOMB), null);
 
-        ItemStack arrow = createItemStack("Retour", Material.TIPPED_ARROW);
-        PotionMeta meta = (PotionMeta) arrow.getItemMeta();
-        meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
-        arrow.setItemMeta(meta);
-
-        addItem(45, arrow, () -> new ChooseModificationGUI(player, jobToModify).openInventory());
+        addBackButton();
     }
 
     @Override
@@ -62,5 +53,10 @@ public class ChooseXpMethod extends GUI {
     @Override
     public void computeInput(String input) {
 
+    }
+
+    @Override
+    protected String getTitle() {
+        return ChatColor.RED + "Choisissez l'action à modifier";
     }
 }

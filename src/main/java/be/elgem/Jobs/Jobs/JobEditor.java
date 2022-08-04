@@ -1,14 +1,12 @@
 package be.elgem.Jobs.Jobs;
 
 import be.elgem.Configuration.CustomConfigurationInterface;
-import be.elgem.Jobs.Misc.XpSteps;
 import be.elgem.Jobs.Misc.EXpMethod;
-import be.elgem.Jobs.Misc.ExperienceValues;
 import be.elgem.Main;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.TreeMap;
+
 import java.util.UUID;
 
 public class JobEditor {

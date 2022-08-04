@@ -6,19 +6,18 @@ import com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.material.Skull;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -28,6 +27,8 @@ public abstract class GUI {
 
     protected Inventory menu;
 
+    final protected int size;
+
     protected HashMap<Integer, Runnable> actionsForItems;
 
     protected boolean isWaitingForInput = false;
@@ -36,12 +37,20 @@ public abstract class GUI {
     protected boolean isWaitingForItemSelection = false;
     protected String itemSelectionDestination = "";
 
-    public GUI(Player player, int size, String title) {
+    protected GUI previousGui;
+
+    public GUI(Player player, int size, GUI previousGuis) {
         this.player = player;
 
         actionsForItems = new HashMap<>();
 
-        menu = Bukkit.createInventory(player, size, title);
+        this.size = size;
+
+        this.previousGui = previousGuis;
+    }
+
+    protected void createInventory(int size) {
+        menu = Bukkit.createInventory(player, size, getTitle());
     }
 
     public static ItemStack createItemStack(Material material) {
@@ -93,9 +102,17 @@ public abstract class GUI {
         }
     }
 
+    public void resetAndOpenInventory() {
+        this.menu = null;
+        openInventory();
+    }
+
     public void openInventory() {
-        menu.clear();
-        createInventory();
+        if(this.menu == null) {
+            createInventory(this.size);
+            createGUI();
+        }
+
         Main.getMain().getOpenedGUI().addGUI(player, this);
         player.openInventory(menu);
     }
@@ -112,6 +129,19 @@ public abstract class GUI {
 
     protected void clearActions() {
         actionsForItems.clear();
+    }
+
+    protected void openPreviousGUI() {
+        previousGui.resetAndOpenInventory();
+    }
+
+    protected void addBackButton() {
+        ItemStack arrow = createItemStack("Retour", Material.TIPPED_ARROW);
+        PotionMeta meta = (PotionMeta) arrow.getItemMeta();
+        meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
+        arrow.setItemMeta(meta);
+
+        addItem(menu.getSize() - 9, arrow, this::openPreviousGUI);
     }
 
     public Inventory getMenu() {
@@ -158,7 +188,7 @@ public abstract class GUI {
         return isWaitingForItemSelection;
     }
 
-    protected abstract void createInventory();
+    protected abstract void createGUI();
 
     public void getInput(String input) {
         isWaitingForInput = false;
@@ -175,4 +205,6 @@ public abstract class GUI {
     protected abstract void computeSelectedItem(ItemStack item);
 
     protected abstract void computeInput(String input);
+
+    protected abstract String getTitle();
 }

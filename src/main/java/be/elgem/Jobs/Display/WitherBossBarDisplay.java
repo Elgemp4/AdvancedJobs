@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 
 public class WitherBossBarDisplay extends Display{
-    private HashMap<Player, BossBar> playerBossBars;
+    final private HashMap<Player, BossBar> playerBossBars;
 
     public WitherBossBarDisplay() {
         playerBossBars = new HashMap<>();
@@ -28,7 +28,7 @@ public class WitherBossBarDisplay extends Display{
 
         playerBossBars.put(player, bossBar);
 
-        removeAfterTwoSeconds(player, bossBar);
+        removeAfterTwoSeconds(bossBar);
     }
 
     private void removeBossBarFromPlayer(Player player) {
@@ -37,9 +37,7 @@ public class WitherBossBarDisplay extends Display{
         }
     }
 
-    private void removeAfterTwoSeconds(Player player, BossBar bossBar) {
-        Bukkit.getScheduler().runTaskLater(Main.getMain(), () -> {
-            bossBar.removeAll();
-        }, 40);
+    private void removeAfterTwoSeconds(BossBar bossBar) {
+        Bukkit.getScheduler().runTaskLater(Main.getMain(), bossBar::removeAll, 40);
     }
 }

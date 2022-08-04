@@ -14,14 +14,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 
 public class XpSourceEditor extends GUI {
-    private EXpMethod xpMethod;
+    final private EXpMethod xpMethod;
 
-    private Job jobToModify;
+    final private Job jobToModify;
 
-    private String xpSourceToEdit;
+    final private String xpSourceToEdit;
 
-    public XpSourceEditor(Player player, EXpMethod wayToXP, String xpSource, Job editedJob) {
-        super(player, 27, "Editeur d'xp pour " + xpSource);
+    final private GUI previousGUI;
+
+    public XpSourceEditor(Player player, EXpMethod wayToXP, String xpSource, Job editedJob, GUI previousGUI) {
+        super(player, 27, previousGUI);
 
         this.xpMethod = wayToXP;
         
@@ -30,10 +32,12 @@ public class XpSourceEditor extends GUI {
         this.player = player;
 
         this.jobToModify = editedJob;
+
+        this.previousGUI = previousGUI;
     }
 
     @Override
-    protected void createInventory() {
+    protected void createGUI() {
         surroundWith(createItemStack(" ", Material.GREEN_STAINED_GLASS_PANE));
 
         ItemStack amountOfXpList = createItemStack("Liste des quantités d'xp par niveau", Material.EXPERIENCE_BOTTLE);
@@ -55,12 +59,12 @@ public class XpSourceEditor extends GUI {
         addItem(16, createSkull("Ajouter une étape d'xp", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNWZmMzE0MzFkNjQ1ODdmZjZlZjk4YzA2NzU4MTA2ODFmOGMxM2JmOTZmNTFkOWNiMDdlZDc4NTJiMmZmZDEifX19"),
                 () -> startWaitingForInput("[Jobs] Entrez l'étape que vous souhaitez ajouter : ", "xpStepToAdd"));
 
-        addItem(18, createItemStack("Retour", Material.TIPPED_ARROW), () -> new BreakGUI(player, jobToModify).openInventory());
         addItem(26, createItemStack("Supprimer la source d'expérience", Material.BARRIER), () -> {
             jobToModify.removeXpSource(xpMethod, xpSourceToEdit);
-            new BreakGUI(player, jobToModify).openInventory();
+            this.openPreviousGUI();
         });
 
+        addBackButton();
     }
 
     @Override
@@ -80,13 +84,13 @@ public class XpSourceEditor extends GUI {
 
                     } else {
                         jobToModify.removeXpStep(xpMethod, xpSourceToEdit, intInput);
-                        new XpSourceEditor(player, xpMethod, xpSourceToEdit, jobToModify).openInventory();
+                        resetAndOpenInventory();
                     }
 
                     break;
                 case "levelToModify":
                     if(jobToModify.getXpSteps(xpMethod, xpSourceToEdit).getAmountOfXpPerLevel().containsKey(intInput)) {
-                        new XpStepEditorGui(player, jobToModify, xpMethod, xpSourceToEdit, intInput).openInventory();
+                        new XpStepEditorGui(player, jobToModify, xpMethod, xpSourceToEdit, intInput, this).openInventory();
 
                     } else {
                         player.sendMessage("[Jobs] L'étape n'existe pas.");
@@ -94,12 +98,13 @@ public class XpSourceEditor extends GUI {
 
                     break;
                 case "xpStepToAdd":
-                    if(jobToModify.getXpSteps(xpMethod, xpSourceToEdit).getAmountOfXpPerLevel().containsKey(intInput)) {
+                    if(jobToModify.getXpSteps(xpMethod, xpSourceToEdit) == null || (!jobToModify.getXpSteps(xpMethod, xpSourceToEdit).getAmountOfXpPerLevel().containsKey(intInput))) {
+                        jobToModify.addXpStep(xpMethod, xpSourceToEdit, intInput, 0);
+                        new XpStepEditorGui(player, jobToModify, xpMethod, xpSourceToEdit, intInput, this).openInventory();
+                    }
+                    else {
                         player.sendMessage("[Jobs] L'étape existe déjà.");
 
-                    } else {
-                        jobToModify.addXpStep(xpMethod, xpSourceToEdit, intInput, 0);
-                        new XpStepEditorGui(player, jobToModify, xpMethod, xpSourceToEdit, intInput).openInventory();
                     }
 
                     break;
@@ -108,7 +113,11 @@ public class XpSourceEditor extends GUI {
         catch(NumberFormatException e){
             player.sendMessage("[Jobs] Vous devez entrer un nombre valide !");
         }
+    }
 
+    @Override
+    protected String getTitle() {
+        return "Editeur d'xp pour " + xpSourceToEdit;
     }
 
     public static ArrayList<String> createXpSourceLore(Job job, EXpMethod xpMethod, String xpSource) {
@@ -118,7 +127,8 @@ public class XpSourceEditor extends GUI {
 
         if(xpSteps == null) {
             lore.add("Aucun niveau n'a été défini");
-        } else {
+        }
+        else {
             for (int level : xpSteps.getAmountOfXpPerLevel().keySet()) {
                 ExperienceValues experienceValues = xpSteps.getAmountOfXpPerLevel().get(level);
                 if(experienceValues.isSingleValue()){
@@ -133,4 +143,8 @@ public class XpSourceEditor extends GUI {
 
         return lore;
     }
+
+//    public GUI getPreviousGUI() {
+//        return previousGUI;
+//    }
 }

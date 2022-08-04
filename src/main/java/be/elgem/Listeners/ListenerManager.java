@@ -35,6 +35,8 @@ public class ListenerManager {
         listeners.add(new ItemUseListener());
 
         listeners.add(new ChatListener());
+
+        listeners.add(new MobKillListener());
     }
 
     private void registerListeners() {
